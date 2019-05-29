@@ -33,6 +33,17 @@ public:
 	}
 };
 
+#define PBSTR "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+#define PBWIDTH 60
+
+void printProgress(double percentage) {
+	int val = (int)(percentage * 100);
+	int lpad = (int)(percentage * PBWIDTH);
+	int rpad = PBWIDTH - lpad;
+	printf("\r%3d%% [%.*s%*s]", val, lpad, PBSTR, rpad, "");
+	fflush(stdout);
+}
+
 
 int main(int ac, char** av) {
 	FreeImageWrapper fiw;
@@ -94,9 +105,12 @@ int main(int ac, char** av) {
 				cout << inFolderPath << " is a directory containing:" << endl;
 				path lastFramePath;
 
+				int numFiles = 0;
 				for (directory_entry& x : directory_iterator(inFolderPath)) {
-					if (x.path().extension() != ".jpg") // must be jpg
+					if (x.path().extension() != ".jpg") {// must be jpg
+						++numFiles;
 						continue;
+					}
 					lastFramePath = x.path();
 				}
 
@@ -104,7 +118,10 @@ int main(int ac, char** av) {
 				if (!imgBG.load((char*)lastFramePath.string().c_str()))
 					throw(exception((stringstream("Error. Failed to load image: ") << lastFramePath).str().c_str()));
 
+				int fileCount = 0;
 				for (directory_entry& x : directory_iterator(inFolderPath)) {
+					++fileCount;
+					//printProgress((double)fileCount / (double)numFiles);
 					if (x.path().extension() != ".jpg") // must be jpg
 						continue;
 
@@ -148,7 +165,7 @@ int main(int ac, char** av) {
 							BYTE* dst = imgDD.accessPixels();
 							for (unsigned yi = 0; yi < height; yi++) {
 								for (unsigned xi = 0; xi < width; xi++, ++srcA, ++srcB, ++dst) {
-									*dst = (BYTE)abs((int)*srcA - (int)*srcB);
+									*dst = min(255, 2 * (BYTE)abs((int)* srcA - (int)* srcB));
 								}
 							}
 						}
