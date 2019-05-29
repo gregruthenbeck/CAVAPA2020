@@ -87,6 +87,8 @@ int main(int ac, char** av) {
 			remove(x.path());
 		}
 
+		fipImage prevDelta;
+
 		if (exists(inFolderPath)) {
 			if (is_directory(inFolderPath)) {
 				cout << inFolderPath << " is a directory containing:" << endl;
@@ -131,10 +133,34 @@ int main(int ac, char** av) {
 								//*(dst + 2) = c;
 							}
 						}
+
+						// Blur
+						for (int i = 0; i < 3; ++i) {
+							imgDelta.rescale(width / 4, height / 4, FREE_IMAGE_FILTER::FILTER_BILINEAR);
+							imgDelta.rescale(width, height, FREE_IMAGE_FILTER::FILTER_BICUBIC);
+						}
+
+						// DD is Delta of the Deltas
+						fipImage imgDD(FIT_BITMAP, width, height, 8);
+						if (prevDelta.isValid()) {
+							const BYTE* srcA = imgDelta.accessPixels();
+							const BYTE* srcB = prevDelta.accessPixels();
+							BYTE* dst = imgDD.accessPixels();
+							for (unsigned yi = 0; yi < height; yi++) {
+								for (unsigned xi = 0; xi < width; xi++, ++srcA, ++srcB, ++dst) {
+									*dst = (BYTE)abs((int)*srcA - (int)*srcB);
+								}
+							}
+						}
+						prevDelta = imgDelta;
+
+						if (!imgDD.isValid())
+							continue;
+
 						string outFilename = x.path().filename().string();
 						path outFilepath = outFolderPath;
 						outFilepath.append(outFilename);
-						if (!imgDelta.save(outFilepath.string().c_str()))
+						if (!imgDD.save(outFilepath.string().c_str()))
 							throw(exception((stringstream("Error. Failed to save image: ") << outFilepath).str().c_str()));
 					}
 					catch (std::exception const& e) {
