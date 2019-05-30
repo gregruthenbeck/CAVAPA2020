@@ -275,6 +275,7 @@ int main(int ac, char** av) {
 					}
 					csvFile.flush();
 					csvFile.close();
+					cout << "Data written to CSV file " << canonical(path(outCSVFilepath)) << endl;
 				}
 				else {
 					cout << "Error attempting to open output file. Filepath=\"" << outCSVFilepath << "\"" << endl;
@@ -287,7 +288,7 @@ int main(int ac, char** av) {
 		}
 	}
 	catch (const filesystem_error& ex) {
-		cout << ex.what() << endl;
+		cout << "filesystem_error exception thrown: " << ex.what() << endl;
 	}
 	cout << "done" << endl;
 }
