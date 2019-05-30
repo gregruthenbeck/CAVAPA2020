@@ -8,6 +8,9 @@
 #include <boost/program_options.hpp>
 #include <FreeImage.h>
 #include <../Wrapper/FreeImagePlus/FreeImagePlus.h>
+#include <ppltasks.h>
+#include <concurrent_vector.h>
+#include <tuple>
 
 using namespace std;
 using namespace boost::filesystem;
@@ -41,6 +44,81 @@ __int64 time_call(Function&& f) {
 	__int64 begin = GetTickCount();
 	f();
 	return GetTickCount() - begin;
+}
+
+
+concurrency::task<tuple<int, path, Image> > CreateForegroundMaskAsync(int index, const path& imgFilepath, const Image& imgBG, const float bgThreshSq) {
+	return concurrency::create_task([index, imgFilepath, imgBG, bgThreshSq] {
+		Image img;
+		try {
+			if (!img.load((char*)imgFilepath.string().c_str()))
+				throw(exception((stringstream("Error. Failed to load image: ") << imgFilepath).str().c_str()));
+
+			const unsigned width = FreeImage_GetWidth(img);
+			const unsigned height = FreeImage_GetHeight(img);
+			const int bpp = FreeImage_GetBPP(img) / 8;
+			Image imgDelta(FIT_BITMAP, width, height, 8);
+			const BYTE* srcA = img.accessPixels();
+			const BYTE* srcB = imgBG.accessPixels();
+			BYTE* dst = imgDelta.accessPixels();
+			for (unsigned yi = 0; yi < height; yi++) {
+				for (unsigned xi = 0; xi < width; xi++, srcA += bpp, srcB += bpp, ++dst) {
+					int r = ((int) * (srcA + 0)) - ((int) * (srcB + 0));
+					int g = ((int) * (srcA + 1)) - ((int) * (srcB + 1));
+					int b = ((int) * (srcA + 2)) - ((int) * (srcB + 2));
+					float deltaSq = (float)(r * r + g * g + b * b);
+					BYTE c = (deltaSq > bgThreshSq) ? 255 : 0;
+					//BYTE deltaByte = (BYTE)min(255.0f, delta);
+					*dst = c;
+					//*(dst + 1) = c;
+					//*(dst + 2) = c;
+				}
+			}
+
+			// Blur
+			for (int i = 0; i < 3; ++i) {
+				imgDelta.rescale(width / 4, height / 4, FREE_IMAGE_FILTER::FILTER_BILINEAR);
+				imgDelta.rescale(width, height, FREE_IMAGE_FILTER::FILTER_BICUBIC);
+			}
+			return make_tuple(index, imgFilepath, imgDelta);
+		}
+		catch (std::exception const& e) {
+			std::cerr << e.what() << std::endl;
+		}
+		return make_tuple(-1, imgFilepath, img);
+		});
+}
+
+concurrency::task<void> CreateAndSaveDeltaAsync(int index, const path& outFilepath, const Image& imgA, const Image& imgB) {
+	return concurrency::create_task([index, outFilepath, imgA, imgB] {
+		if (!imgA.isValid() || !imgB.isValid()) {
+			return;
+		}
+
+		try {
+			const unsigned width = FreeImage_GetWidth((Image)imgA);
+			const unsigned height = FreeImage_GetHeight((Image)imgA);
+			const int bpp = FreeImage_GetBPP((Image)imgA) / 8;
+			Image imgDD(FIT_BITMAP, width, height, 8);
+			const BYTE* srcA = imgA.accessPixels();
+			const BYTE* srcB = imgB.accessPixels();
+			BYTE* dst = imgDD.accessPixels();
+			for (unsigned yi = 0; yi < height; ++yi) {
+				for (unsigned xi = 0; xi < width; ++xi, ++srcA, ++srcB, ++dst) {
+					*dst = min(255, 2 * (BYTE)abs((int)* srcA - (int)* srcB));
+				}
+			}
+
+			if (!imgDD.isValid())
+				return;
+
+			if (!imgDD.save(outFilepath.string().c_str()))
+				throw(exception((stringstream("Error. Failed to save image: ") << outFilepath).str().c_str()));
+		}
+		catch (std::exception const& e) {
+			std::cerr << e.what() << std::endl;
+		}
+	});
 }
 
 
@@ -118,73 +196,104 @@ int main(int ac, char** av) {
 				if (!imgBG.load((char*)lastFramePath.string().c_str()))
 					throw(exception((stringstream("Error. Failed to load image: ") << lastFramePath).str().c_str()));
 
+				const int filesChunkSize = 128;
 				int fileCount = 0;
 				__int64 elapsedMillis = 0L;
+				tuple<int, path, Image> seam;
+				vector<concurrency::task<tuple<int, path, Image> > > foregroundImageTasks;
 				for (directory_entry& x : directory_iterator(inFolderPath)) {
 					++fileCount;
 					elapsedMillis += time_call([&] {
-						//printProgress((double)fileCount / (double)numFiles);
 						if (x.path().extension() != ".jpg") // must be jpg
 							return;
 
-						try {
-							Image img;
-							if (!img.load((char*)x.path().string().c_str()))
-								throw(exception((stringstream("Error. Failed to load image: ") << x.path()).str().c_str()));
+						foregroundImageTasks.push_back(CreateForegroundMaskAsync(fileCount - 1, x.path(), imgBG, bgThreshSq));
 
-							const unsigned width = FreeImage_GetWidth(img);
-							const unsigned height = FreeImage_GetHeight(img);
-							const int bpp = FreeImage_GetBPP(img) / 8;
-							Image imgDelta(FIT_BITMAP, width, height, 8);
-							const BYTE* srcA = img.accessPixels();
-							const BYTE* srcB = imgBG.accessPixels();
-							BYTE* dst = imgDelta.accessPixels();
-							for (unsigned yi = 0; yi < height; yi++) {
-								for (unsigned xi = 0; xi < width; xi++, srcA += bpp, srcB += bpp, ++dst) {
-									int r = ((int) * (srcA + 0)) - ((int) * (srcB + 0));
-									int g = ((int) * (srcA + 1)) - ((int) * (srcB + 1));
-									int b = ((int) * (srcA + 2)) - ((int) * (srcB + 2));
-									float deltaSq = (float)(r * r + g * g + b * b);
-									BYTE c = (deltaSq > bgThreshSq) ? 255 : 0;
-									//BYTE deltaByte = (BYTE)min(255.0f, delta);
-									*dst = c;
-									//*(dst + 1) = c;
-									//*(dst + 2) = c;
-								}
+						if ((fileCount % filesChunkSize) == 0) {
+							vector<tuple<int, path, Image> > foregrounds;
+							for (auto& t : foregroundImageTasks) {
+								foregrounds.push_back(t.get());
 							}
+							foregroundImageTasks.clear();
+							sort(begin(foregrounds), end(foregrounds), [](auto const& t1, auto const& t2) {
+								return get<0>(t1) < get<0>(t2); // or use a custom compare function
+								});
+							vector<concurrency::task<void> > deltaImageTasks;
+							Image prevImg = get<2>(seam);
 
-							// Blur
-							for (int i = 0; i < 3; ++i) {
-								imgDelta.rescale(width / 4, height / 4, FREE_IMAGE_FILTER::FILTER_BILINEAR);
-								imgDelta.rescale(width, height, FREE_IMAGE_FILTER::FILTER_BICUBIC);
+							for (auto& t : foregrounds) {
+								path inPath = get<1>(t);
+								string outFilename = inPath.filename().string();
+								path outFilepath = outFolderPath;
+								outFilepath.append(outFilename);
+								Image img = get<2>(t);
+								deltaImageTasks.push_back(CreateAndSaveDeltaAsync(fileCount - 1, outFilepath, prevImg, img));
+								prevImg = img;
 							}
-
-							// DD is Delta of the Deltas
-							Image imgDD(FIT_BITMAP, width, height, 8);
-							if (prevDelta.isValid()) {
-								const BYTE* srcA = imgDelta.accessPixels();
-								const BYTE* srcB = prevDelta.accessPixels();
-								BYTE* dst = imgDD.accessPixels();
-								for (unsigned yi = 0; yi < height; ++yi) {
-									for (unsigned xi = 0; xi < width; ++xi, ++srcA, ++srcB, ++dst) {
-										*dst = min(255, 2 * (BYTE)abs((int)* srcA - (int)* srcB));
-									}
-								}
+							for (auto& t : deltaImageTasks) {
+								t.wait();
 							}
-							prevDelta = imgDelta;
-
-							if (!imgDD.isValid())
-								return;
-
-							string outFilename = x.path().filename().string();
-							path outFilepath = outFolderPath;
-							outFilepath.append(outFilename);
-							if (!imgDD.save(outFilepath.string().c_str()))
-								throw(exception((stringstream("Error. Failed to save image: ") << outFilepath).str().c_str()));
+							seam = foregrounds[foregrounds.size() - 1];
 						}
-						catch (std::exception const& e) {
-							std::cerr << e.what() << std::endl;
-						}
+
+					//	try {
+					//		Image img;
+					//		if (!img.load((char*)x.path().string().c_str()))
+					//			throw(exception((stringstream("Error. Failed to load image: ") << x.path()).str().c_str()));
+
+					//		const unsigned width = FreeImage_GetWidth(img);
+					//		const unsigned height = FreeImage_GetHeight(img);
+					//		const int bpp = FreeImage_GetBPP(img) / 8;
+					//		Image imgDelta(FIT_BITMAP, width, height, 8);
+					//		const BYTE* srcA = img.accessPixels();
+					//		const BYTE* srcB = imgBG.accessPixels();
+					//		BYTE* dst = imgDelta.accessPixels();
+					//		for (unsigned yi = 0; yi < height; yi++) {
+					//			for (unsigned xi = 0; xi < width; xi++, srcA += bpp, srcB += bpp, ++dst) {
+					//				int r = ((int) * (srcA + 0)) - ((int) * (srcB + 0));
+					//				int g = ((int) * (srcA + 1)) - ((int) * (srcB + 1));
+					//				int b = ((int) * (srcA + 2)) - ((int) * (srcB + 2));
+					//				float deltaSq = (float)(r * r + g * g + b * b);
+					//				BYTE c = (deltaSq > bgThreshSq) ? 255 : 0;
+					//				//BYTE deltaByte = (BYTE)min(255.0f, delta);
+					//				*dst = c;
+					//				//*(dst + 1) = c;
+					//				//*(dst + 2) = c;
+					//			}
+					//		}
+
+					//		// Blur
+					//		for (int i = 0; i < 3; ++i) {
+					//			imgDelta.rescale(width / 4, height / 4, FREE_IMAGE_FILTER::FILTER_BILINEAR);
+					//			imgDelta.rescale(width, height, FREE_IMAGE_FILTER::FILTER_BICUBIC);
+					//		}
+
+					//		// DD is Delta of the Deltas
+					//		Image imgDD(FIT_BITMAP, width, height, 8);
+					//		if (prevDelta.isValid()) {
+					//			const BYTE* srcA = imgDelta.accessPixels();
+					//			const BYTE* srcB = prevDelta.accessPixels();
+					//			BYTE* dst = imgDD.accessPixels();
+					//			for (unsigned yi = 0; yi < height; ++yi) {
+					//				for (unsigned xi = 0; xi < width; ++xi, ++srcA, ++srcB, ++dst) {
+					//					*dst = min(255, 2 * (BYTE)abs((int)* srcA - (int)* srcB));
+					//				}
+					//			}
+					//		}
+					//		prevDelta = imgDelta;
+
+					//		if (!imgDD.isValid())
+					//			return;
+
+					//		string outFilename = x.path().filename().string();
+					//		path outFilepath = outFolderPath;
+					//		outFilepath.append(outFilename);
+					//		if (!imgDD.save(outFilepath.string().c_str()))
+					//			throw(exception((stringstream("Error. Failed to save image: ") << outFilepath).str().c_str()));
+					//	}
+					//	catch (std::exception const& e) {
+					//		std::cerr << e.what() << std::endl;
+					//	}
 					});
 					cout << "\r" << (int)(100.0 * (double)fileCount / (double)(numFiles-1)) << "% done. " << 
 						"Processing image " << fileCount << "/" << numFiles << ".  " <<
