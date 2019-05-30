@@ -182,8 +182,6 @@ int main(int ac, char** av) {
 			remove(x.path());
 		}
 
-		Image prevDelta;
-		//const float bgThreshold = 48.0f;
 		const float bgThreshSq = bgThreshold * bgThreshold;
 
 		if (exists(inFolderPath)) {
@@ -203,7 +201,6 @@ int main(int ac, char** av) {
 				if (!imgBG.load((char*)lastFramePath.string().c_str()))
 					throw(exception((stringstream("Error. Failed to load image: ") << lastFramePath).str().c_str()));
 
-				//const int filesChunkSize = 128;
 				int fileCount = 0;
 				__int64 elapsedMillis = 0L;
 				tuple<int, path, Image> seam;
@@ -223,7 +220,7 @@ int main(int ac, char** av) {
 							}
 							foregroundImageTasks.clear();
 							sort(begin(foregrounds), end(foregrounds), [](auto const& t1, auto const& t2) {
-								return get<0>(t1) < get<0>(t2); // or use a custom compare function
+								return get<0>(t1) < get<0>(t2); // sort based on the index (first element in the tuple)
 								});
 							vector<concurrency::task<void> > deltaImageTasks;
 							Image prevImg = get<2>(seam);
