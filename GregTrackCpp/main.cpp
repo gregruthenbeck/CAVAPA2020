@@ -154,7 +154,7 @@ int main(int ac, char** av) {
 	string outFolder = "";
 	if (vm.count("outputFolder")) {
 		outFolder = vm["outputFolder"].as<string>();
-		cout << "Output images folder " << inFolder << "." << endl;
+		cout << "Output images folder " << outFolder << "." << endl;
 	}
 	else {
 		cout << "Output folder must be set." << endl;
@@ -235,69 +235,10 @@ int main(int ac, char** av) {
 							}
 							seam = foregrounds[foregrounds.size() - 1];
 						}
-
-					//	try {
-					//		Image img;
-					//		if (!img.load((char*)x.path().string().c_str()))
-					//			throw(exception((stringstream("Error. Failed to load image: ") << x.path()).str().c_str()));
-
-					//		const unsigned width = FreeImage_GetWidth(img);
-					//		const unsigned height = FreeImage_GetHeight(img);
-					//		const int bpp = FreeImage_GetBPP(img) / 8;
-					//		Image imgDelta(FIT_BITMAP, width, height, 8);
-					//		const BYTE* srcA = img.accessPixels();
-					//		const BYTE* srcB = imgBG.accessPixels();
-					//		BYTE* dst = imgDelta.accessPixels();
-					//		for (unsigned yi = 0; yi < height; yi++) {
-					//			for (unsigned xi = 0; xi < width; xi++, srcA += bpp, srcB += bpp, ++dst) {
-					//				int r = ((int) * (srcA + 0)) - ((int) * (srcB + 0));
-					//				int g = ((int) * (srcA + 1)) - ((int) * (srcB + 1));
-					//				int b = ((int) * (srcA + 2)) - ((int) * (srcB + 2));
-					//				float deltaSq = (float)(r * r + g * g + b * b);
-					//				BYTE c = (deltaSq > bgThreshSq) ? 255 : 0;
-					//				//BYTE deltaByte = (BYTE)min(255.0f, delta);
-					//				*dst = c;
-					//				//*(dst + 1) = c;
-					//				//*(dst + 2) = c;
-					//			}
-					//		}
-
-					//		// Blur
-					//		for (int i = 0; i < 3; ++i) {
-					//			imgDelta.rescale(width / 4, height / 4, FREE_IMAGE_FILTER::FILTER_BILINEAR);
-					//			imgDelta.rescale(width, height, FREE_IMAGE_FILTER::FILTER_BICUBIC);
-					//		}
-
-					//		// DD is Delta of the Deltas
-					//		Image imgDD(FIT_BITMAP, width, height, 8);
-					//		if (prevDelta.isValid()) {
-					//			const BYTE* srcA = imgDelta.accessPixels();
-					//			const BYTE* srcB = prevDelta.accessPixels();
-					//			BYTE* dst = imgDD.accessPixels();
-					//			for (unsigned yi = 0; yi < height; ++yi) {
-					//				for (unsigned xi = 0; xi < width; ++xi, ++srcA, ++srcB, ++dst) {
-					//					*dst = min(255, 2 * (BYTE)abs((int)* srcA - (int)* srcB));
-					//				}
-					//			}
-					//		}
-					//		prevDelta = imgDelta;
-
-					//		if (!imgDD.isValid())
-					//			return;
-
-					//		string outFilename = x.path().filename().string();
-					//		path outFilepath = outFolderPath;
-					//		outFilepath.append(outFilename);
-					//		if (!imgDD.save(outFilepath.string().c_str()))
-					//			throw(exception((stringstream("Error. Failed to save image: ") << outFilepath).str().c_str()));
-					//	}
-					//	catch (std::exception const& e) {
-					//		std::cerr << e.what() << std::endl;
-					//	}
 					});
 					cout << "\r" << (int)(100.0 * (double)fileCount / (double)(numFiles-1)) << "% done. " << 
-						"Processing image " << fileCount << "/" << numFiles << ".  " <<
-						(int)((double)elapsedMillis / (double)fileCount) << "ms per image.";
+						"Processing frame " << fileCount << "/" << numFiles << ". " <<
+						(int)((double)elapsedMillis / (double)fileCount) << "ms per frame.";
 					fflush(stdout);
 				}
 				cout << endl;
@@ -309,6 +250,7 @@ int main(int ac, char** av) {
 		}
 	}
 	catch (const filesystem_error& ex) {
-		cout << ex.what() << '\n';
+		cout << ex.what() << endl;
 	}
+	cout << "done" << endl;
 }
