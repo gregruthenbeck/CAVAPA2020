@@ -89,13 +89,14 @@ concurrency::task<tuple<int, path, Image> > CreateForegroundMaskAsync(int index,
 		});
 }
 
-concurrency::task<void> CreateAndSaveDeltaAsync(int index, const path& outFilepath, const Image& imgA, const Image& imgB) {
-	return concurrency::create_task([index, outFilepath, imgA, imgB] {
+concurrency::task<tuple<int, double > > CreateAndSaveDeltaAsync(int index, bool skipSave, const path& outFilepath, const Image& imgA, const Image& imgB) {
+	return concurrency::create_task([index, skipSave, outFilepath, imgA, imgB] {
 		if (!imgA.isValid() || !imgB.isValid()) {
-			return;
+			return make_tuple(-1,0.0);
 		}
 
 		try {
+			double pixCount = 0.0;
 			const unsigned width = FreeImage_GetWidth((Image)imgA);
 			const unsigned height = FreeImage_GetHeight((Image)imgA);
 			const int bpp = FreeImage_GetBPP((Image)imgA) / 8;
@@ -105,34 +106,41 @@ concurrency::task<void> CreateAndSaveDeltaAsync(int index, const path& outFilepa
 			BYTE* dst = imgDD.accessPixels();
 			for (unsigned yi = 0; yi < height; ++yi) {
 				for (unsigned xi = 0; xi < width; ++xi, ++srcA, ++srcB, ++dst) {
-					*dst = min(255, 2 * (BYTE)abs((int)* srcA - (int)* srcB));
+					const auto delta = abs((int)* srcA - (int)* srcB);
+					*dst = min(255, 2 * (BYTE)delta);
+					pixCount += (double)delta;
 				}
 			}
 
-			if (!imgDD.isValid())
-				return;
+			if (!skipSave) {
+				if (!imgDD.isValid())
+					return make_tuple(-1, 0.0);
 
-			if (!imgDD.save(outFilepath.string().c_str()))
-				throw(exception((stringstream("Error. Failed to save image: ") << outFilepath).str().c_str()));
+				if (!imgDD.save(outFilepath.string().c_str()))
+					throw(exception((stringstream("Error. Failed to save image: ") << outFilepath).str().c_str()));
+			}
+			return make_tuple(index, pixCount);
 		}
 		catch (std::exception const& e) {
 			std::cerr << e.what() << std::endl;
 		}
+		return make_tuple(-1, 0.0);
 	});
 }
 
 
 int main(int ac, char** av) {
-	FreeImageWrapper fiw;
+	FreeImageWrapper fiw; // init and uninit of FreeImage
 	// Declare the supported options.
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help", "produce help message")
 		("inputFolder,i", po::value<string>(), "folder containing JPG files of video frames")
-		("outputFolder,o", po::value<string>(), "output folder")
+		("outputFolder,o", po::value<string>(), "output folder (optional)")
 		("bgThreshold,bg", po::value<float>()->default_value(48.0f), "used to identify tracked pixels, lower values will be noisier")
 		("parallelChunkSize,p", po::value<int>()->default_value(128), "the number of files processed in parallel")
 		("blurIterations,b", po::value<int>()->default_value(3), "number of times the blur is applied")
+		("csvDataFilenameOut,d", po::value<string>()->default_value("data.csv"), "output CSV data filename (path)")
 		;
 
 	po::variables_map vm;
@@ -155,31 +163,39 @@ int main(int ac, char** av) {
 	}
 
 	string outFolder = "";
+	bool skipImgOutput = false;
+	path outFolderPath;
 	if (vm.count("outputFolder")) {
 		outFolder = vm["outputFolder"].as<string>();
 		cout << "Output images folder " << outFolder << "." << endl;
+		outFolderPath = outFolder.c_str();
+		if (!exists(outFolderPath) || !is_directory(outFolderPath)) {
+			cout << "Output folder must exist. Folder=" << outFolderPath << endl;
+			return EXIT_FAILURE;
+		}
 	}
 	else {
-		cout << "Output folder must be set." << endl;
-		return EXIT_FAILURE;
+		skipImgOutput = true;
+		cout << "Output images folder not set. Skipping image output." << endl;
 	}
 
 	const float bgThreshold = vm["bgThreshold"].as<float>();
 	const int chunkSize = vm["parallelChunkSize"].as<int>();
 	const int blueIterations = vm["blurIterations"].as<int>();
+	const string outCSVFilepath = vm["csvDataFilenameOut"].as<string>();
+
+	if (exists(outCSVFilepath)) { // delete the CSV if it exists
+		remove(outCSVFilepath);
+	}
 
 	path inFolderPath(inFolder.c_str());
-	path outFolderPath(outFolder.c_str());
-
-	if (!exists(outFolderPath) || !is_directory(outFolderPath)) {
-		cout << "Output folder must exist. Folder=" << outFolderPath << endl;
-		return EXIT_FAILURE;
-	}
 
 	try {
 		// Clear the output folder
-		for (directory_entry& x : directory_iterator(outFolderPath)) {
-			remove(x.path());
+		if (exists(outFolderPath) && is_directory(outFolderPath)) {
+			for (directory_entry& x : directory_iterator(outFolderPath)) {
+				remove(x.path());
+			}
 		}
 
 		const float bgThreshSq = bgThreshold * bgThreshold;
@@ -205,6 +221,7 @@ int main(int ac, char** av) {
 				__int64 elapsedMillis = 0L;
 				tuple<int, path, Image> seam;
 				vector<concurrency::task<tuple<int, path, Image> > > foregroundImageTasks;
+				vector<tuple<int, double> > movementPixelTotals;
 				for (directory_entry& x : directory_iterator(inFolderPath)) {
 					++fileCount;
 					elapsedMillis += time_call([&] {
@@ -222,7 +239,7 @@ int main(int ac, char** av) {
 							sort(begin(foregrounds), end(foregrounds), [](auto const& t1, auto const& t2) {
 								return get<0>(t1) < get<0>(t2); // sort based on the index (first element in the tuple)
 								});
-							vector<concurrency::task<void> > deltaImageTasks;
+							vector<concurrency::task<tuple<int,double > > > deltaImageTasks;
 							Image prevImg = get<2>(seam);
 
 							for (auto& t : foregrounds) {
@@ -231,11 +248,11 @@ int main(int ac, char** av) {
 								path outFilepath = outFolderPath;
 								outFilepath.append(outFilename);
 								Image img = get<2>(t);
-								deltaImageTasks.push_back(CreateAndSaveDeltaAsync(fileCount - 1, outFilepath, prevImg, img));
+								deltaImageTasks.push_back(CreateAndSaveDeltaAsync(fileCount - 1, skipImgOutput, outFilepath, prevImg, img));
 								prevImg = img;
 							}
 							for (auto& t : deltaImageTasks) {
-								t.wait();
+								movementPixelTotals.push_back(t.get());
 							}
 							seam = foregrounds[foregrounds.size() - 1];
 						}
@@ -246,6 +263,22 @@ int main(int ac, char** av) {
 					fflush(stdout);
 				}
 				cout << endl;
+				
+				sort(begin(movementPixelTotals), end(movementPixelTotals), [](auto const& t1, auto const& t2) {
+					return get<0>(t1) < get<0>(t2); // sort based on the index (first element in the tuple)
+					});
+
+				std::ofstream csvFile(outCSVFilepath.c_str(), std::ofstream::out);
+				if (csvFile.good()) {
+					for (auto& d : movementPixelTotals) {
+						csvFile << get<1>(d) << "," << endl;
+					}
+					csvFile.flush();
+					csvFile.close();
+				}
+				else {
+					cout << "Error attempting to open output file. Filepath=\"" << outCSVFilepath << "\"" << endl;
+				}
 			}
 		}
 		else {
