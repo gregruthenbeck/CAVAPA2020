@@ -12,6 +12,7 @@
 using namespace std;
 using namespace boost::filesystem;
 namespace po = boost::program_options;
+typedef fipImage Image;
 
 void FreeImageErrorHandler(FREE_IMAGE_FORMAT fif, const char* message) {
 	if (fif != FIF_UNKNOWN) {
@@ -29,19 +30,17 @@ public:
 		FreeImage_SetOutputMessage(FreeImageErrorHandler);
 	}
 	~FreeImageWrapper() {
- 		FreeImage_DeInitialise(); // Call once
+		FreeImage_DeInitialise(); // Call once
 	}
 };
 
-#define PBSTR "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
-#define PBWIDTH 60
-
-void printProgress(double percentage) {
-	int val = (int)(percentage * 100);
-	int lpad = (int)(percentage * PBWIDTH);
-	int rpad = PBWIDTH - lpad;
-	printf("\r%3d%% [%.*s%*s]", val, lpad, PBSTR, rpad, "");
-	fflush(stdout);
+// Calls the provided work function and returns the number of milliseconds 
+// that it takes to call that function.
+template <class Function>
+__int64 time_call(Function&& f) {
+	__int64 begin = GetTickCount();
+	f();
+	return GetTickCount() - begin;
 }
 
 
@@ -98,92 +97,101 @@ int main(int ac, char** av) {
 			remove(x.path());
 		}
 
-		fipImage prevDelta;
+		Image prevDelta;
+		const float bgThreshold = 48.0f;
+		const float bgThreshSq = bgThreshold * bgThreshold;
 
 		if (exists(inFolderPath)) {
 			if (is_directory(inFolderPath)) {
-				cout << inFolderPath << " is a directory containing:" << endl;
 				path lastFramePath;
 
 				int numFiles = 0;
 				for (directory_entry& x : directory_iterator(inFolderPath)) {
 					if (x.path().extension() != ".jpg") {// must be jpg
-						++numFiles;
 						continue;
 					}
+					++numFiles;
 					lastFramePath = x.path();
 				}
 
-				fipImage imgBG;
+				Image imgBG;
 				if (!imgBG.load((char*)lastFramePath.string().c_str()))
 					throw(exception((stringstream("Error. Failed to load image: ") << lastFramePath).str().c_str()));
 
 				int fileCount = 0;
+				__int64 elapsedMillis = 0L;
 				for (directory_entry& x : directory_iterator(inFolderPath)) {
 					++fileCount;
-					//printProgress((double)fileCount / (double)numFiles);
-					if (x.path().extension() != ".jpg") // must be jpg
-						continue;
+					elapsedMillis += time_call([&] {
+						//printProgress((double)fileCount / (double)numFiles);
+						if (x.path().extension() != ".jpg") // must be jpg
+							return;
 
-					try {
-						fipImage img;
-						if (!img.load((char*)x.path().string().c_str()))
-							throw(exception((stringstream("Error. Failed to load image: ") << x.path()).str().c_str()));
+						try {
+							Image img;
+							if (!img.load((char*)x.path().string().c_str()))
+								throw(exception((stringstream("Error. Failed to load image: ") << x.path()).str().c_str()));
 
-						const unsigned width = FreeImage_GetWidth(img);
-						const unsigned height = FreeImage_GetHeight(img);
-						const int bpp = FreeImage_GetBPP(img)/8;
-						fipImage imgDelta(FIT_BITMAP, width, height, 8);
-						const BYTE* srcA = img.accessPixels();
-						const BYTE* srcB = imgBG.accessPixels();
-						BYTE* dst = imgDelta.accessPixels();
-						for (unsigned yi = 0; yi < height; yi++) {
-							for (unsigned xi = 0; xi < width; xi++, srcA+=bpp,srcB+=bpp,++dst) {
-								int r = ((int) * (srcA + 0)) - ((int) * (srcB + 0));
-								int g = ((int) * (srcA + 1)) - ((int) * (srcB + 1));
-								int b = ((int) * (srcA + 2)) - ((int) * (srcB + 2));
-								float delta = sqrtf((float)(r * r + g * g + b * b));
-								BYTE c = (delta > 48.0f) ? 255 : 0;
-								//BYTE deltaByte = (BYTE)min(255.0f, delta);
-								*dst = c;
-								//*(dst + 1) = c;
-								//*(dst + 2) = c;
-							}
-						}
-
-						// Blur
-						for (int i = 0; i < 3; ++i) {
-							imgDelta.rescale(width / 4, height / 4, FREE_IMAGE_FILTER::FILTER_BILINEAR);
-							imgDelta.rescale(width, height, FREE_IMAGE_FILTER::FILTER_BICUBIC);
-						}
-
-						// DD is Delta of the Deltas
-						fipImage imgDD(FIT_BITMAP, width, height, 8);
-						if (prevDelta.isValid()) {
-							const BYTE* srcA = imgDelta.accessPixels();
-							const BYTE* srcB = prevDelta.accessPixels();
-							BYTE* dst = imgDD.accessPixels();
+							const unsigned width = FreeImage_GetWidth(img);
+							const unsigned height = FreeImage_GetHeight(img);
+							const int bpp = FreeImage_GetBPP(img) / 8;
+							Image imgDelta(FIT_BITMAP, width, height, 8);
+							const BYTE* srcA = img.accessPixels();
+							const BYTE* srcB = imgBG.accessPixels();
+							BYTE* dst = imgDelta.accessPixels();
 							for (unsigned yi = 0; yi < height; yi++) {
-								for (unsigned xi = 0; xi < width; xi++, ++srcA, ++srcB, ++dst) {
-									*dst = min(255, 2 * (BYTE)abs((int)* srcA - (int)* srcB));
+								for (unsigned xi = 0; xi < width; xi++, srcA += bpp, srcB += bpp, ++dst) {
+									int r = ((int) * (srcA + 0)) - ((int) * (srcB + 0));
+									int g = ((int) * (srcA + 1)) - ((int) * (srcB + 1));
+									int b = ((int) * (srcA + 2)) - ((int) * (srcB + 2));
+									float deltaSq = (float)(r * r + g * g + b * b);
+									BYTE c = (deltaSq > bgThreshSq) ? 255 : 0;
+									//BYTE deltaByte = (BYTE)min(255.0f, delta);
+									*dst = c;
+									//*(dst + 1) = c;
+									//*(dst + 2) = c;
 								}
 							}
+
+							// Blur
+							for (int i = 0; i < 3; ++i) {
+								imgDelta.rescale(width / 4, height / 4, FREE_IMAGE_FILTER::FILTER_BILINEAR);
+								imgDelta.rescale(width, height, FREE_IMAGE_FILTER::FILTER_BICUBIC);
+							}
+
+							// DD is Delta of the Deltas
+							Image imgDD(FIT_BITMAP, width, height, 8);
+							if (prevDelta.isValid()) {
+								const BYTE* srcA = imgDelta.accessPixels();
+								const BYTE* srcB = prevDelta.accessPixels();
+								BYTE* dst = imgDD.accessPixels();
+								for (unsigned yi = 0; yi < height; ++yi) {
+									for (unsigned xi = 0; xi < width; ++xi, ++srcA, ++srcB, ++dst) {
+										*dst = min(255, 2 * (BYTE)abs((int)* srcA - (int)* srcB));
+									}
+								}
+							}
+							prevDelta = imgDelta;
+
+							if (!imgDD.isValid())
+								return;
+
+							string outFilename = x.path().filename().string();
+							path outFilepath = outFolderPath;
+							outFilepath.append(outFilename);
+							if (!imgDD.save(outFilepath.string().c_str()))
+								throw(exception((stringstream("Error. Failed to save image: ") << outFilepath).str().c_str()));
 						}
-						prevDelta = imgDelta;
-
-						if (!imgDD.isValid())
-							continue;
-
-						string outFilename = x.path().filename().string();
-						path outFilepath = outFolderPath;
-						outFilepath.append(outFilename);
-						if (!imgDD.save(outFilepath.string().c_str()))
-							throw(exception((stringstream("Error. Failed to save image: ") << outFilepath).str().c_str()));
-					}
-					catch (std::exception const& e) {
-						std::cerr << e.what() << std::endl;
-					}
+						catch (std::exception const& e) {
+							std::cerr << e.what() << std::endl;
+						}
+					});
+					cout << "\r" << (int)(100.0 * (double)fileCount / (double)(numFiles-1)) << "% done. " << 
+						"Processing image " << fileCount << "/" << numFiles << ".  " <<
+						(int)((double)elapsedMillis / (double)fileCount) << "ms per image.";
+					fflush(stdout);
 				}
+				cout << endl;
 			}
 		}
 		else {
