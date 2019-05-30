@@ -230,7 +230,7 @@ int main(int ac, char** av) {
 
 						foregroundImageTasks.push_back(CreateForegroundMaskAsync(fileCount - 1, x.path(), imgBG, bgThreshSq, blueIterations));
 
-						if ((fileCount % chunkSize) == 0 || fileCount == numFiles) {
+						if ((fileCount % chunkSize) == 0 || fileCount == numFiles) { // be careful with remainder in last chunk
 							vector<tuple<int, path, Image> > foregrounds;
 							for (auto& t : foregroundImageTasks) {
 								foregrounds.push_back(t.get());
