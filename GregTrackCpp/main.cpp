@@ -191,8 +191,8 @@ int main(int ac, char** av) {
 	path inFolderPath(inFolder.c_str());
 
 	try {
-		// Clear the output folder
-		if (exists(outFolderPath) && is_directory(outFolderPath)) {
+		// Clear the output folder (if we are not skipping the image output)
+		if (!skipImgOutput && exists(outFolderPath) && is_directory(outFolderPath)) {
 			for (directory_entry& x : directory_iterator(outFolderPath)) {
 				remove(x.path());
 			}
