@@ -47,8 +47,8 @@ __int64 time_call(Function&& f) {
 }
 
 
-concurrency::task<tuple<int, path, Image> > CreateForegroundMaskAsync(int index, const path& imgFilepath, const Image& imgBG, const float bgThreshSq) {
-	return concurrency::create_task([index, imgFilepath, imgBG, bgThreshSq] {
+concurrency::task<tuple<int, path, Image> > CreateForegroundMaskAsync(int index, const path& imgFilepath, const Image& imgBG, const float bgThreshSq, const int blurIterations) {
+	return concurrency::create_task([index, imgFilepath, imgBG, bgThreshSq, blurIterations] {
 		Image img;
 		try {
 			if (!img.load((char*)imgFilepath.string().c_str()))
@@ -76,7 +76,7 @@ concurrency::task<tuple<int, path, Image> > CreateForegroundMaskAsync(int index,
 			}
 
 			// Blur
-			for (int i = 0; i < 3; ++i) {
+			for (int i = 0; i < blurIterations; ++i) {
 				imgDelta.rescale(width / 4, height / 4, FREE_IMAGE_FILTER::FILTER_BILINEAR);
 				imgDelta.rescale(width, height, FREE_IMAGE_FILTER::FILTER_BICUBIC);
 			}
@@ -130,6 +130,9 @@ int main(int ac, char** av) {
 		("help", "produce help message")
 		("inputFolder,i", po::value<string>(), "folder containing JPG files of video frames")
 		("outputFolder,o", po::value<string>(), "output folder")
+		("bgThreshold,bg", po::value<float>()->default_value(48.0f), "used to identify tracked pixels, lower values will be noisier")
+		("parallelChunkSize,p", po::value<int>()->default_value(128), "the number of files processed in parallel")
+		("blurIterations,b", po::value<int>()->default_value(3), "number of times the blur is applied")
 		;
 
 	po::variables_map vm;
@@ -161,6 +164,10 @@ int main(int ac, char** av) {
 		return EXIT_FAILURE;
 	}
 
+	const float bgThreshold = vm["bgThreshold"].as<float>();
+	const int chunkSize = vm["parallelChunkSize"].as<int>();
+	const int blueIterations = vm["blurIterations"].as<int>();
+
 	path inFolderPath(inFolder.c_str());
 	path outFolderPath(outFolder.c_str());
 
@@ -176,7 +183,7 @@ int main(int ac, char** av) {
 		}
 
 		Image prevDelta;
-		const float bgThreshold = 48.0f;
+		//const float bgThreshold = 48.0f;
 		const float bgThreshSq = bgThreshold * bgThreshold;
 
 		if (exists(inFolderPath)) {
@@ -196,7 +203,7 @@ int main(int ac, char** av) {
 				if (!imgBG.load((char*)lastFramePath.string().c_str()))
 					throw(exception((stringstream("Error. Failed to load image: ") << lastFramePath).str().c_str()));
 
-				const int filesChunkSize = 128;
+				//const int filesChunkSize = 128;
 				int fileCount = 0;
 				__int64 elapsedMillis = 0L;
 				tuple<int, path, Image> seam;
@@ -207,9 +214,9 @@ int main(int ac, char** av) {
 						if (x.path().extension() != ".jpg") // must be jpg
 							return;
 
-						foregroundImageTasks.push_back(CreateForegroundMaskAsync(fileCount - 1, x.path(), imgBG, bgThreshSq));
+						foregroundImageTasks.push_back(CreateForegroundMaskAsync(fileCount - 1, x.path(), imgBG, bgThreshSq, blueIterations));
 
-						if ((fileCount % filesChunkSize) == 0) {
+						if ((fileCount % chunkSize) == 0 || fileCount == numFiles) {
 							vector<tuple<int, path, Image> > foregrounds;
 							for (auto& t : foregroundImageTasks) {
 								foregrounds.push_back(t.get());
