@@ -15,6 +15,50 @@ using namespace std;
 using namespace boost::filesystem;
 using namespace boost::date_time;
 
+typedef unsigned char AccDataReadMode;
+static const AccDataReadMode ADRM_MARKER = 0;
+static const AccDataReadMode ADRM_DATA = 1;
+struct AccDataReadMarker {
+	unsigned char day, month, year, hour, min, sec;
+};
+
+unsigned char hexToInt(unsigned char c) {
+	return (c / 16 * 10) + c % 16;
+}
+
+AccDataReadMarker ReadFileMarker(std::ifstream& fs) {
+	AccDataReadMarker m{};
+	// Hex editors show that there are "AA AA" markers at regular intervals (which is 170dec)
+	unsigned char d = 0;
+	fs >> d;
+	if (d != 170 && d != 0) {
+		throw;
+		return m;
+	}
+	if (d == 0) {
+		return m;
+	}
+	fs >> d;
+	if (d != 170 && d != 0) {
+		throw;
+		return m;
+	}
+
+	fs.read((char*)& m.day, 1);
+	fs.read((char*)& m.month, 1);
+	fs.read((char*)& m.year, 1);
+	fs.read((char*)& m.hour, 1);
+	fs.read((char*)& m.min, 1);
+	fs.read((char*)& m.sec, 1);
+	m.day = hexToInt(m.day);
+	m.month = hexToInt(m.month);
+	m.year = hexToInt(m.year);
+	m.hour = hexToInt(m.hour);
+	m.min = hexToInt(m.min);
+	m.sec = hexToInt(m.sec);
+	return m;
+}
+
 template<typename T>
 struct Vec3 {
 	T x, y, z;
@@ -58,7 +102,7 @@ int main() {
 	const string inFileExt = ".dat";
 	const vector<string> inFilenames{ "acc1", "acc2", "acc3", "acc4", "acc5", "acc6", "acc7", "acc8" };
 	const string outFilepath = "../data_out/acc-all.csv";
-	const int averagingWindowLen = 500;
+	const int averagingWindowLen = 100;
 
 	/*
 	ls -la --time-style=full-iso
@@ -166,9 +210,6 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 	int fileCount = 0;
 	for (auto& inFile : inFiles) {
 		cout << "\r" << "Processing input file " << ++fileCount << "/" << inFiles.size() << ". Filepath=\"" << inFilepaths[fileCount - 1] << "\"";
-		// Data alignment (file header length can result in bad reads of 2-byte data chunks)
-		char junk;
-		inFile.read(&junk, 1);
 
 		WindowAverager<double> windower;
 		windower.SetWindowLength(averagingWindowLen);
@@ -190,8 +231,18 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 		unsigned long count = 0L;
 		unsigned long writtenCount = 0L;
 		unsigned saveInterval = 100; // write every 'n' samples (skip the rest)
+		AccDataReadMode readMode = ADRM_MARKER; // Read in either a marker (time stamps at regular intervals) or data.
+		vector<AccDataReadMarker> markers;
 		while (!inFile.eof() && inFile.good()) {
 			try {
+				if (readMode == ADRM_MARKER) {
+					AccDataReadMarker m = ReadFileMarker(inFile);
+					markers.push_back(m);
+					readMode = ADRM_DATA;
+				}
+				if (count % 84 == 83) { // (512 - sizeof(marker)) / 6 = 84, where bytes-per-sample is 6
+					readMode = ADRM_MARKER;
+				}
 				inFile.read((char*)& data, sizeof(AccelData));
 				++count;
 				if (count < start) {
