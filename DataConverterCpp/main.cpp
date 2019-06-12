@@ -44,7 +44,15 @@ public:
 
 
 int main() {
-	const vector<string> inFilepaths{ "acc (1).dat", "acc (2).dat", "acc (3).dat", "acc (4).dat", "acc (5).dat", "acc (6).dat",	"acc (7).dat", "acc (8).dat" };
+	const vector<string> inFilepaths{ 
+		"acc (1).dat", 
+		"acc (2).dat", 
+		"acc (3).dat", 
+		"acc (4).dat", 
+		"acc (5).dat", 
+		"acc (6).dat",	
+		"acc (7).dat", 
+		"acc (8).dat" };
 	const string outFilepath = "acc-all.csv";
 	const int averagingWindowLen = 100;
 
