@@ -118,19 +118,22 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 	}
 
 	vector<CTime> fileStartTimes;
-	cout << "ID, Start, Duration, End" << endl;
 	for (int i = 0; i != 8; ++i) {
 		fileStartTimes.push_back(fileCreatedTimes[i] - fileDurations[i]);
-		SYSTEMTIME st,ste;
-		fileStartTimes.back().GetAsSystemTime(st);
+	}
+
+	cout << "ID, Start, Duration, End" << endl;
+	for (int i = 0; i != 8; ++i) {
+		SYSTEMTIME st, ste;
+		fileStartTimes[i].GetAsSystemTime(st);
 		fileCreatedTimes[i].GetAsSystemTime(ste);
 		auto& dur = fileDurations[i];
-		cout << (i+1) << ", " <<
-			"Start " << st.wDay << "." << st.wMonth << "." << st.wYear << " " << 
-			st.wHour << ":" << setfill('0') << setw(2) << st.wMinute << ":" << setfill('0') << setw(2) << st.wSecond << ", " << 
+		cout << (i + 1) << ", " <<
+			"Start " << st.wDay << "." << st.wMonth << "." << st.wYear << " " <<
+			st.wHour << ":" << setfill('0') << setw(2) << st.wMinute << ":" << setfill('0') << setw(2) << st.wSecond << ", " <<
 			"Duration " << dur.GetTotalHours() << "h" << setfill('0') << setw(2) << dur.GetMinutes() << "m" << setfill('0') << setw(2) << dur.GetSeconds() << "s, " <<
 			"End " << ste.wDay << "." << ste.wMonth << "." << ste.wYear << " " <<
-			ste.wHour << ":" << setfill('0') << setw(2) << ste.wMinute << ":" << setfill('0') << setw(2) << ste.wSecond << 
+			ste.wHour << ":" << setfill('0') << setw(2) << ste.wMinute << ":" << setfill('0') << setw(2) << ste.wSecond <<
 			endl;
 	}
 
