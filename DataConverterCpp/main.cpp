@@ -17,9 +17,9 @@ typedef Vec3<unsigned short> AccelData;
 
 template <typename T>
 double Length(const Vec3<T>& v) {
-	return sqrt((double)v.x * (double)v.x + 
-				(double)v.y * (double)v.y + 
-		        (double)v.z * (double)v.z);
+	return sqrt((double)v.x * (double)v.x +
+		(double)v.y * (double)v.y +
+		(double)v.z * (double)v.z);
 }
 
 template <typename T>
@@ -44,17 +44,14 @@ public:
 
 
 int main() {
-	const vector<string> inFilepaths{ 
-		"acc (1).dat", 
-		"acc (2).dat", 
-		"acc (3).dat", 
-		"acc (4).dat", 
-		"acc (5).dat", 
-		"acc (6).dat",	
-		"acc (7).dat", 
-		"acc (8).dat" };
-	const string outFilepath = "acc-all.csv";
+	const string inFolder = "../data_in";
+	const vector<string> inFilenames{ "acc (1).dat", "acc (2).dat", "acc (3).dat", "acc (4).dat", "acc (5).dat", "acc (6).dat",	"acc (7).dat", "acc (8).dat" };
+	const string outFilepath = "../data_out/acc-all.csv";
 	const int averagingWindowLen = 100;
+
+	vector<string> inFilepaths;
+	for (auto& fname : inFilenames)
+		inFilepaths.push_back(inFolder + "/" + fname);
 
 	vector<ifstream> inFiles;
 	for (auto& fpath : inFilepaths) {
@@ -74,7 +71,7 @@ int main() {
 
 	int fileCount = 0;
 	for (auto& inFile : inFiles) {
-		cout << "\r" << "Processing input file " << ++fileCount << "/" << inFiles.size() << ". Filepath=\"" << inFilepaths[fileCount-1] << "\"";
+		cout << "\r" << "Processing input file " << ++fileCount << "/" << inFiles.size() << ". Filepath=\"" << inFilepaths[fileCount - 1] << "\"";
 		// Data alignment (file header length can result in bad reads of 2-byte data chunks)
 		char junk;
 		inFile.read(&junk, 1);
