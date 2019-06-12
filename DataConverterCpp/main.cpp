@@ -181,7 +181,7 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 			endl;
 	}
 
-	CTime startTime(2019, 5, 26, 14, 0, 0); // The experiment started at about 2:30pm on Sunday 26/5/2019
+	CTime startTime(2019, 5, 26, 15, 0, 0); // The experiment started at about 2:30pm on Sunday 26/5/2019
 	vector<unsigned long> startSampleIds;
 	for (int i = 0; i != 8; ++i) {
 		//CTimeSpan delta = startTime - fileStartTimes[i]; // dist from start
@@ -226,34 +226,33 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 		can be skipped at the beginning of hr.dat, and not more than 2hrs of the subsequent data is of
 		interest (2*100*60*60=720,000 samples for the 2hrs at 100Hz).
 		*/
-		unsigned long start = startSampleIds[fileCount-1];// 6.516E6L;// -(30 * 60 * 100); // start 30mins earlier (30*60*100)
-		unsigned long duration = 720000;
+		unsigned long start = numeric_limits<unsigned long>::max();// startSampleIds[fileCount - 1];// 6.516E6L;// -(30 * 60 * 100); // start 30mins earlier (30*60*100)
+		unsigned long duration = 360000;
 		unsigned long count = 0L;
 		unsigned long writtenCount = 0L;
 		unsigned saveInterval = 100; // write every 'n' samples (skip the rest)
-		AccDataReadMode readMode = ADRM_MARKER; // Read in either a marker (time stamps at regular intervals) or data.
 		vector<CTime> markers;
 		while (!inFile.eof() && inFile.good()) {
 			try {
-				if (readMode == ADRM_MARKER) {
+				if (count % 84 == 0) {
 					AccDataReadMarker m = ReadFileMarker(inFile);
-					markers.push_back(CTime(2000 + m.year, m.month, m.day, m.hour, m.min, m.sec));
-					if (markers.size() > 1) {
-						const auto& a = markers.back();
-						const auto& b = markers[markers.size() - 2];
-						CTimeSpan delta = a - b;
-						if (a.GetYear() != 2000 && b.GetYear() != 2000 && // Ok to have 'null' time stamps as markers
-							delta.GetTotalSeconds() > 1) { // not ok to have deltas greater than 1s
-							throw;
-						}
+						markers.push_back(CTime(2000 + m.year, m.month, m.day, m.hour, m.min, m.sec));
+						if (markers.size() > 1) {
+							const auto& a = markers.back();
+							const auto& b = markers[markers.size() - 2];
+							CTimeSpan delta = a - b;
+							if (a.GetYear() != 2000 && b.GetYear() != 2000 && // Ok to have 'null' time stamps as markers
+								delta.GetTotalSeconds() > 1) { // not ok to have deltas greater than 1s
+								throw;
+							}
 					}
-					readMode = ADRM_DATA;
-				}
-				if (count % 84 == 83) { // (512 - sizeof(marker)) / 6 = 84, where bytes-per-sample is 6
-					readMode = ADRM_MARKER;
 				}
 				inFile.read((char*)& data, sizeof(AccelData));
 				++count;
+				auto delta = startTime - markers.back();
+				if (delta.GetTotalSeconds() < 1) {
+					start = count;
+				}
 				if (count < start) {
 					continue;
 				}
