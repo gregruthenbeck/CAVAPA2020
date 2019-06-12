@@ -58,7 +58,7 @@ int main() {
 	const string inFileExt = ".dat";
 	const vector<string> inFilenames{ "acc1", "acc2", "acc3", "acc4", "acc5", "acc6", "acc7", "acc8" };
 	const string outFilepath = "../data_out/acc-all.csv";
-	const int averagingWindowLen = 100;
+	const int averagingWindowLen = 500;
 
 	/*
 	ls -la --time-style=full-iso
@@ -84,7 +84,7 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 2019-05-27 18:04:06
 */
 
-	const CTime fileCreatedTimes[8] = {
+	const CTime fileEndTimes[8] = {
 			{2019,05,27,17,33,00},
 			{2019,05,27,17,39,00},
 			{2019,05,27,17,43,16},
@@ -119,14 +119,14 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 
 	vector<CTime> fileStartTimes;
 	for (int i = 0; i != 8; ++i) {
-		fileStartTimes.push_back(fileCreatedTimes[i] - fileDurations[i]);
+		fileStartTimes.push_back(fileEndTimes[i] - fileDurations[i]);
 	}
 
 	cout << "ID, Start, Duration, End" << endl;
 	for (int i = 0; i != 8; ++i) {
 		SYSTEMTIME st, ste;
 		fileStartTimes[i].GetAsSystemTime(st);
-		fileCreatedTimes[i].GetAsSystemTime(ste);
+		fileEndTimes[i].GetAsSystemTime(ste);
 		auto& dur = fileDurations[i];
 		cout << (i + 1) << ", " <<
 			"Start " << st.wDay << "." << st.wMonth << "." << st.wYear << " " <<
@@ -137,6 +137,15 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 			endl;
 	}
 
+	CTime startTime(2019, 5, 26, 14, 0, 0); // The experiment started at about 2:30pm on Sunday 26/5/2019
+	vector<unsigned long> startSampleIds;
+	for (int i = 0; i != 8; ++i) {
+		//CTimeSpan delta = startTime - fileStartTimes[i]; // dist from start
+		//startSampleIds.push_back(100 * delta.GetTotalSeconds());
+		CTimeSpan delta = fileEndTimes[i] - startTime; // dist from end
+		startSampleIds.push_back(100 * (fileDurations[i].GetTotalSeconds() - delta.GetTotalSeconds()));
+	}
+
 	vector<std::ifstream> inFiles;
 	for (auto& fpath : inFilepaths) {
 		inFiles.push_back(std::ifstream(fpath.c_str(), ios::in | ios::binary));
@@ -145,6 +154,7 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 			return -1;
 		}
 	}
+
 	std::ofstream outFile(outFilepath.c_str(), ios::out);
 	if (!outFile.good()) {
 		cout << "Error opening output file. Filepath=\"" << outFilepath << "\"" << endl;
@@ -162,6 +172,8 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 
 		WindowAverager<double> windower;
 		windower.SetWindowLength(averagingWindowLen);
+		WindowAverager<double> windowerLong;
+		windowerLong.SetWindowLength(averagingWindowLen);
 		AccelData data;
 		vector<double> fileData;
 		/*
@@ -173,7 +185,7 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 		can be skipped at the beginning of hr.dat, and not more than 2hrs of the subsequent data is of
 		interest (2*100*60*60=720,000 samples for the 2hrs at 100Hz).
 		*/
-		unsigned long start = 6.516E6L;// -(30 * 60 * 100); // start 30mins earlier (30*60*100)
+		unsigned long start = startSampleIds[fileCount-1];// 6.516E6L;// -(30 * 60 * 100); // start 30mins earlier (30*60*100)
 		unsigned long duration = 720000;
 		unsigned long count = 0L;
 		unsigned long writtenCount = 0L;
@@ -191,8 +203,9 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 				}
 				const double len = Length(data);
 				const double ave = windower.AddGetAverage(len);
+				const double longAve = windowerLong.AddGetAverage(ave);
 				if (writtenCount % saveInterval == 0) {
-					fileData.push_back(ave - len);
+					fileData.push_back(abs(ave - longAve));
 				}
 			}
 			catch (...) {
