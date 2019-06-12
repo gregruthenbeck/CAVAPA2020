@@ -102,7 +102,8 @@ int main() {
 	const string inFileExt = ".dat";
 	const vector<string> inFilenames{ "acc1", "acc2", "acc3", "acc4", "acc5", "acc6", "acc7", "acc8" };
 	const string outFilepath = "../data_out/acc-all.csv";
-	const int averagingWindowLen = 100;
+	const int averagingWindowLen = 3000;
+	const int averagingWindowLen2 = 1000;
 
 	/*
 	ls -la --time-style=full-iso
@@ -214,7 +215,7 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 		WindowAverager<double> windower;
 		windower.SetWindowLength(averagingWindowLen);
 		WindowAverager<double> windowerLong;
-		windowerLong.SetWindowLength(averagingWindowLen);
+		windowerLong.SetWindowLength(averagingWindowLen2);
 		AccelData data;
 		vector<double> fileData;
 		/*
