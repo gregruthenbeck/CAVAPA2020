@@ -232,12 +232,21 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 		unsigned long writtenCount = 0L;
 		unsigned saveInterval = 100; // write every 'n' samples (skip the rest)
 		AccDataReadMode readMode = ADRM_MARKER; // Read in either a marker (time stamps at regular intervals) or data.
-		vector<AccDataReadMarker> markers;
+		vector<CTime> markers;
 		while (!inFile.eof() && inFile.good()) {
 			try {
 				if (readMode == ADRM_MARKER) {
 					AccDataReadMarker m = ReadFileMarker(inFile);
-					markers.push_back(m);
+					markers.push_back(CTime(2000 + m.year, m.month, m.day, m.hour, m.min, m.sec));
+					if (markers.size() > 1) {
+						const auto& a = markers.back();
+						const auto& b = markers[markers.size() - 2];
+						CTimeSpan delta = a - b;
+						if (a.GetYear() != 2000 && b.GetYear() != 2000 && // Ok to have 'null' time stamps as markers
+							delta.GetTotalSeconds() > 1) { // not ok to have deltas greater than 1s
+							throw;
+						}
+					}
 					readMode = ADRM_DATA;
 				}
 				if (count % 84 == 83) { // (512 - sizeof(marker)) / 6 = 84, where bytes-per-sample is 6
