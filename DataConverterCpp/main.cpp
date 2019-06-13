@@ -193,8 +193,8 @@ int main() {
 	const vector<string> inFilenames{ "acc1", "acc2", "acc3", "acc4", "acc5", "acc6", "acc7", "acc8" };
 	const string outFilepath = "../data_out/acc-all.csv";
 	const int samplingRateHz = 100;
-	const int averagingWindowLen = 3000;
-	const int averagingWindowLen2 = 1000;
+	const int averagingWindowLen = 500;
+	const int averagingWindowLen2 = 1;
 	CTime roiStartTime(2019, 5, 26, 15, 0, 0); // The experiment started at about 2:30pm on Sunday 26/5/2019
 	const unsigned long roiLen = 360000;	   // samples
 	const unsigned saveInterval = 100;		   // write every 'n' samples (skip the rest. NB: AveWindow doesn't skip any)
@@ -280,9 +280,10 @@ int main() {
 				}
 				const double len = Length(data);
 				const double ave = windower.AddGetAverage(len);
-				const double longAve = windowerLong.AddGetAverage(ave);
+				//const double longAve = windowerLong.AddGetAverage(ave);
 				if (roiCount % saveInterval == 0) {
-					fileData.push_back(abs(ave - longAve));
+					fileData.push_back(abs(ave));
+					//fileData.push_back(abs(ave - longAve));
 				}
 			}
 			catch (...) {
