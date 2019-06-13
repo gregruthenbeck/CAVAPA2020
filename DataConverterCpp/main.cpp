@@ -69,8 +69,8 @@ typedef Vec3<unsigned short> AccelData;
 template <typename T>
 double Length(const Vec3<T>& v) {
 	return sqrt((double)v.x * (double)v.x +
-		(double)v.y * (double)v.y +
-		(double)v.z * (double)v.z);
+				(double)v.y * (double)v.y +
+				(double)v.z * (double)v.z);
 }
 
 template <typename T>
@@ -113,9 +113,40 @@ std::ostream& operator<<(std::ostream& os, const CTimeSpan& dur) {
 	return os;
 }
 
-struct YYMMDDHHMMSS {
-	int year, month, day, hour, min, sec;
-};
+CTimeSpan BytesToTime(const unsigned long bytes, const unsigned bytesPerSecond) {
+	unsigned long t = bytes / bytesPerSecond; // 100Hz, 6-bytes per sample (x/y/z*ushort)
+	const unsigned secs = t % 60;
+	t /= 60;
+	const unsigned mins = t % 60;
+	t /= 60;
+	const unsigned hours = t % 24;
+	t /= 24;
+	const unsigned days = t;
+	return CTimeSpan(days, hours, mins, secs);
+}
+
+/*
+ls -la --time-style=full-iso
+	2019-05-27 17:33:00
+	2019-05-27 17:39:00
+	2019-05-27 17:43:16
+	2019-05-27 17:48:44
+	2019-05-27 17:52:48
+	2019-05-27 17:56:46
+	2019-05-27 18:00:28
+	2019-05-27 18:04:06
+*/
+
+const CTime fileEndTimes[8] = {
+		{2019,05,27,17,33,00},
+		{2019,05,27,17,39,00},
+		{2019,05,27,17,43,16},
+		{2019,05,27,17,48,44},
+		{2019,05,27,17,52,48},
+		{2019,05,27,17,56,46},
+		{2019,05,27,18,00,28},
+		{2019,05,27,18,04,06} };
+
 
 int main() {
 	const string inFolder = "../data_in";
@@ -124,40 +155,6 @@ int main() {
 	const string outFilepath = "../data_out/acc-all.csv";
 	const int averagingWindowLen = 3000;
 	const int averagingWindowLen2 = 1000;
-
-	/*
-	ls -la --time-style=full-iso
-total 740392
-drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:35:28.036879100 +0300 .
-drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
--rwxrwxrwx 1 gruthen gruthen 98519085 2019-05-27 17:33:00.000000000 +0300 acc1.dat
--rwxrwxrwx 1 gruthen gruthen 96438273 2019-05-27 17:39:00.000000000 +0300 acc2.dat
--rwxrwxrwx 1 gruthen gruthen 93231151 2019-05-27 17:43:16.000000000 +0300 acc3.dat
--rwxrwxrwx 1 gruthen gruthen 93552642 2019-05-27 17:48:44.000000000 +0300 acc4.dat
--rwxrwxrwx 1 gruthen gruthen 97869849 2019-05-27 17:52:48.000000000 +0300 acc5.dat
--rwxrwxrwx 1 gruthen gruthen 95025164 2019-05-27 17:56:46.000000000 +0300 acc6.dat
--rwxrwxrwx 1 gruthen gruthen 92198946 2019-05-27 18:00:28.000000000 +0300 acc7.dat
--rwxrwxrwx 1 gruthen gruthen 91303975 2019-05-27 18:04:06.000000000 +0300 acc8.dat
-
-2019-05-27 17:33:00
-2019-05-27 17:39:00
-2019-05-27 17:43:16
-2019-05-27 17:48:44
-2019-05-27 17:52:48
-2019-05-27 17:56:46
-2019-05-27 18:00:28
-2019-05-27 18:04:06
-*/
-
-	const CTime fileEndTimes[8] = {
-			{2019,05,27,17,33,00},
-			{2019,05,27,17,39,00},
-			{2019,05,27,17,43,16},
-			{2019,05,27,17,48,44},
-			{2019,05,27,17,52,48},
-			{2019,05,27,17,56,46},
-			{2019,05,27,18,00,28},
-			{2019,05,27,18,04,06} };
 
 	vector<string> inFilepaths;
 	for (auto& fname : inFilenames)
@@ -171,15 +168,7 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 
 	vector<CTimeSpan> fileDurations;
 	for (auto& fs : fileSizesBytes) {
-		int t = fs / (100 * 6); // 100Hz, 6-bytes per sample (x/y/z*ushort)
-		const int secs = t % 60;
-		t /= 60;
-		const int mins = t % 60;
-		t /= 60;
-		const int hours = t % 24;
-		t /= 24;
-		const int days = t;
-		fileDurations.push_back(CTimeSpan(days,hours, mins, secs));
+		fileDurations.push_back(BytesToTime(fs, 100 * 6)); // 100Hz, 6-bytes per sample (x/y/z*ushort)
 	}
 
 	vector<CTime> fileStartTimes;
