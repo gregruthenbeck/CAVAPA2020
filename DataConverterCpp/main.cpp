@@ -196,8 +196,8 @@ int main() {
 	const int averagingWindowLen = 3000;
 	const int averagingWindowLen2 = 1000;
 	CTime roiStartTime(2019, 5, 26, 15, 0, 0); // The experiment started at about 2:30pm on Sunday 26/5/2019
-	const unsigned long roiLen = 360000; // samples
-	const unsigned saveInterval = 100; // write every 'n' samples (skip the rest. NB: AveWindow doesn't skip any)
+	const unsigned long roiLen = 360000;	   // samples
+	const unsigned saveInterval = 100;		   // write every 'n' samples (skip the rest. NB: AveWindow doesn't skip any)
 
 	cout << "Input folder:\t\"" << inFolder << "\"" << endl;
 	cout << "Input file extension:\t\"" << inFileExt << "\"" << endl;
@@ -249,25 +249,24 @@ int main() {
 		unsigned long start = numeric_limits<unsigned long>::max(); // set to 'count' when 'marker-time' == 'start-time'
 		unsigned long count = 0L;
 		unsigned long roiCount = 0L;
-		vector<CTime> markers;
+		CTime timeMarker, timeMarkerPrev;
 		while (!inFile.eof() && inFile.good()) {
 			try {
 				if (count % 84 == 0) {
 					AccDataReadMarker m = ReadFileMarker(inFile);
-						markers.push_back(CTime(2000 + m.year, m.month, m.day, m.hour, m.min, m.sec));
-						if (markers.size() > 1) {
-							const auto& a = markers.back();
-							const auto& b = markers[markers.size() - 2];
-							CTimeSpan delta = a - b;
-							if (a.GetYear() != 2000 && b.GetYear() != 2000 && // Ok to have 'null' time stamps as markers
-								delta.GetTotalSeconds() > 1) { // not ok to have deltas greater than 1s
-								throw;
-							}
+					timeMarker = CTime(2000 + m.year, m.month, m.day, m.hour, m.min, m.sec);
+					if (count != 0) { // skip the delta check when we only have the first marker
+						CTimeSpan delta = timeMarker - timeMarkerPrev;
+						if (timeMarker.GetYear() != 2000 && timeMarkerPrev.GetYear() != 2000 && // Ok to have 'null' time stamps as markers
+							delta.GetTotalSeconds() > 1) { // not ok to have deltas greater than 1s
+							throw;
+						}
 					}
+					timeMarkerPrev = timeMarker;
 				}
 				inFile.read((char*)& data, sizeof(AccelData));
 				++count;
-				auto delta = roiStartTime - markers.back();
+				auto delta = roiStartTime - timeMarker;
 				if (delta.GetTotalSeconds() < 1) {
 					start = count;
 					startedAtSampleId[fileCount - 1] = start;
