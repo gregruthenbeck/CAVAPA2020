@@ -31,7 +31,7 @@ AccDataReadMarker ReadFileMarker(std::ifstream& fs) {
 	AccDataReadMarker m{};
 	// Hex editors show that there are "AA AA" markers at regular intervals (which is 170dec)
 	unsigned char d = 0;
-	fs >> d;
+	fs.read((char*)&d, 1);
 	if (d != 170 && d != 0) {
 		throw;
 		return m;
@@ -39,7 +39,7 @@ AccDataReadMarker ReadFileMarker(std::ifstream& fs) {
 	if (d == 0) {
 		return m;
 	}
-	fs >> d;
+	fs.read((char*)& d, 1);
 	if (d != 170 && d != 0) {
 		throw;
 		return m;
@@ -141,22 +141,48 @@ ls -la --time-style=full-iso
 	2019-05-27 18:00:28
 	2019-05-27 18:04:06
 */
-const CTime fileEndTimes[8] = {
-		{2019,05,27,17,33,00},
-		{2019,05,27,17,39,00},
-		{2019,05,27,17,43,16},
-		{2019,05,27,17,48,44},
-		{2019,05,27,17,52,48},
-		{2019,05,27,17,56,46},
-		{2019,05,27,18,00,28},
-		{2019,05,27,18,04,06} };
+//const CTime fileEndTimes[8] = { // Doesn't affect output data (only logged info)
+//		{2019,05,27,17,33,00},
+//		{2019,05,27,17,39,00},
+//		{2019,05,27,17,43,16},
+//		{2019,05,27,17,48,44},
+//		{2019,05,27,17,52,48},
+//		{2019,05,27,17,56,46},
+//		{2019,05,27,18,00,28},
+//		{2019,05,27,18,04,06} };
+//// Estimate the start times from the number of samples and the file-creation time
+//vector<unsigned long> fileSizesBytes;
+//for (auto& fp : inFilepaths)
+//fileSizesBytes.push_back((unsigned long)file_size(fp.c_str()));
+//
+//vector<CTimeSpan> fileDurations;
+//for (auto& fs : fileSizesBytes)
+//fileDurations.push_back(BytesToTime(fs, samplingRateHz * 6)); // 100Hz, 6-bytes per sample (x/y/z*ushort)
+//
+//vector<CTime> fileStartTimes;
+//for (int i = 0; i != 8; ++i)
+//fileStartTimes.push_back(fileEndTimes[i] - fileDurations[i]);
+//
+//cout << "ID, Start, Duration, End" << endl;
+//for (int i = 0; i != 8; ++i) {
+//	cout << (i + 1) << ", Start " << fileStartTimes[i] <<
+//		", Duration " << fileDurations[i] <<
+//		", End " << fileEndTimes[i] << endl;
+//}
+//
+//vector<unsigned long> startSampleIds;
+//for (int i = 0; i != 8; ++i) {
+//	CTimeSpan delta = roiStartTime - fileStartTimes[i]; // dist from start
+//	startSampleIds.push_back((unsigned long)(100 * delta.GetTotalSeconds()));
+//	//CTimeSpan delta = fileEndTimes[i] - startTime; // dist from end
+//	//startSampleIds.push_back(100 * (unsigned long)(fileDurations[i].GetTotalSeconds() - delta.GetTotalSeconds()));
+//}
 
 template < class T >
 std::ostream& operator << (std::ostream& os, const std::vector<T>& v) {
 	os << "[";
-	for (typename std::vector<T>::const_iterator ii = v.begin(); ii != v.end(); ++ii) {
-		os << " " << *ii;
-	}
+	for (auto &i : v)
+		os << " " << i;
 	os << "]";
 	return os;
 }
@@ -171,7 +197,7 @@ int main() {
 	const int averagingWindowLen2 = 1000;
 	CTime roiStartTime(2019, 5, 26, 15, 0, 0); // The experiment started at about 2:30pm on Sunday 26/5/2019
 	const unsigned long roiLen = 360000; // samples
-	const unsigned saveInterval = 100; // write every 'n' samples (skip the rest)
+	const unsigned saveInterval = 100; // write every 'n' samples (skip the rest. NB: AveWindow doesn't skip any)
 
 	cout << "Input folder:\t\"" << inFolder << "\"" << endl;
 	cout << "Input file extension:\t\"" << inFileExt << "\"" << endl;
@@ -190,34 +216,6 @@ int main() {
 	vector<string> inFilepaths;
 	for (auto& fname : inFilenames)
 		inFilepaths.push_back(inFolder + "/" + fname + inFileExt);
-
-	// Estimate the start times from the number of samples and the file-creation time
-	vector<unsigned long> fileSizesBytes;
-	for (auto& fp : inFilepaths) 
-		fileSizesBytes.push_back((unsigned long)file_size(fp.c_str()));
-
-	vector<CTimeSpan> fileDurations;
-	for (auto& fs : fileSizesBytes) 
-		fileDurations.push_back(BytesToTime(fs, samplingRateHz * 6)); // 100Hz, 6-bytes per sample (x/y/z*ushort)
-	
-	vector<CTime> fileStartTimes;
-	for (int i = 0; i != 8; ++i) 
-		fileStartTimes.push_back(fileEndTimes[i] - fileDurations[i]);
-	
-	cout << "ID, Start, Duration, End" << endl;
-	for (int i = 0; i != 8; ++i) {
-		cout << (i + 1) << ", Start "    << fileStartTimes[i] << 
-						   ", Duration " << fileDurations[i] << 
-						   ", End "      << fileEndTimes[i] << endl;
-	}
-
-	vector<unsigned long> startSampleIds;
-	for (int i = 0; i != 8; ++i) {
-		CTimeSpan delta = roiStartTime - fileStartTimes[i]; // dist from start
-		startSampleIds.push_back((unsigned long)(100 * delta.GetTotalSeconds()));
-		//CTimeSpan delta = fileEndTimes[i] - startTime; // dist from end
-		//startSampleIds.push_back(100 * (unsigned long)(fileDurations[i].GetTotalSeconds() - delta.GetTotalSeconds()));
-	}
 
 	vector<std::ifstream> inFiles;
 	for (auto& fpath : inFilepaths) {
@@ -248,7 +246,7 @@ int main() {
 		AccelData data;
 		vector<double> fileData;
 
-		unsigned long start = numeric_limits<unsigned long>::max();// startSampleIds[fileCount - 1];// 6.516E6L;// -(30 * 60 * 100); // start 30mins earlier (30*60*100)
+		unsigned long start = numeric_limits<unsigned long>::max(); // set to 'count' when 'marker-time' == 'start-time'
 		unsigned long count = 0L;
 		unsigned long roiCount = 0L;
 		vector<CTime> markers;
@@ -309,14 +307,6 @@ int main() {
 	}
 	outFile.flush();
 	outFile.close();
-
-	// "startSampleIds" is calculated from the file creation date-time and the file size
-	// "startedAtSampleId" uses the time markers stored in the .dat file at 512byte intervals
-	for (int i = 0; i != 8; ++i) {
-		auto a = startSampleIds[i];
-		auto b = startedAtSampleId[i];
-		cout << a << ", " << b << ", " << abs((long)a - (long)b) << endl;
-	}
 
 	cout << "done" << endl;
 }
