@@ -93,6 +93,26 @@ public:
 	double oneOnLen;
 };
 
+std::ostream& operator<<(std::ostream& os, const CTime& t) {
+	SYSTEMTIME st;
+	t.GetAsSystemTime(st);
+	os << st;
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const SYSTEMTIME& st) {
+	os << st.wDay << "." << st.wMonth << "." << st.wYear << " " <<
+		  st.wHour << ":" << setfill('0') << setw(2) << st.wMinute << ":" << setfill('0') << setw(2) << st.wSecond;
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const CTimeSpan& dur) {
+	os << dur.GetTotalHours() << "h" << 
+		setfill('0') << setw(2) << dur.GetMinutes() << "m" << 
+		setfill('0') << setw(2) << dur.GetSeconds() << "s";
+	return os;
+}
+
 struct YYMMDDHHMMSS {
 	int year, month, day, hour, min, sec;
 };
@@ -169,17 +189,9 @@ drwxrwxrwx 1 gruthen gruthen     4096 2019-06-12 14:08:31.547802400 +0300 ..
 
 	cout << "ID, Start, Duration, End" << endl;
 	for (int i = 0; i != 8; ++i) {
-		SYSTEMTIME st, ste;
-		fileStartTimes[i].GetAsSystemTime(st);
-		fileEndTimes[i].GetAsSystemTime(ste);
-		auto& dur = fileDurations[i];
-		cout << (i + 1) << ", " <<
-			"Start " << st.wDay << "." << st.wMonth << "." << st.wYear << " " <<
-			st.wHour << ":" << setfill('0') << setw(2) << st.wMinute << ":" << setfill('0') << setw(2) << st.wSecond << ", " <<
-			"Duration " << dur.GetTotalHours() << "h" << setfill('0') << setw(2) << dur.GetMinutes() << "m" << setfill('0') << setw(2) << dur.GetSeconds() << "s, " <<
-			"End " << ste.wDay << "." << ste.wMonth << "." << ste.wYear << " " <<
-			ste.wHour << ":" << setfill('0') << setw(2) << ste.wMinute << ":" << setfill('0') << setw(2) << ste.wSecond <<
-			endl;
+		cout << (i + 1) << ", Start "    << fileStartTimes[i] << 
+						   ", Duration " << fileDurations[i] << 
+						   ", End "      << fileEndTimes[i] << endl;
 	}
 
 	CTime startTime(2019, 5, 26, 15, 0, 0); // The experiment started at about 2:30pm on Sunday 26/5/2019
