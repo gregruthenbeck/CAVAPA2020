@@ -141,7 +141,6 @@ ls -la --time-style=full-iso
 	2019-05-27 18:00:28
 	2019-05-27 18:04:06
 */
-
 const CTime fileEndTimes[8] = {
 		{2019,05,27,17,33,00},
 		{2019,05,27,17,39,00},
@@ -181,8 +180,8 @@ int main() {
 	cout << "AveWinLen:\t" << averagingWindowLen << endl;
 	cout << "AveWinLen2:\t" << averagingWindowLen2 << endl;
 	cout << "ROI start time:\t" << roiStartTime << endl;
-	cout << "ROILen:\t" << roiLen << " samples (" << (roiLen / (samplingRateHz * 60 * 60)) << "min)" << endl;
 	cout << "SaveInterval:\t" << saveInterval << " (" << (saveInterval / samplingRateHz) << "Hz)" << endl;
+	cout << "ROILen:\t" << roiLen << "samples (" << (roiLen / (samplingRateHz * 60 * 60)) << "hours = " << (roiLen / saveInterval) << "rows)" << endl;
 
 	if ((saveInterval / samplingRateHz) != 1) {
 		cout << "WARNING: CSV data is written assuming that output rows represent 1Hz" << endl;
@@ -215,7 +214,7 @@ int main() {
 	vector<unsigned long> startSampleIds;
 	for (int i = 0; i != 8; ++i) {
 		CTimeSpan delta = roiStartTime - fileStartTimes[i]; // dist from start
-		startSampleIds.push_back(100 * delta.GetTotalSeconds());
+		startSampleIds.push_back((unsigned long)(100 * delta.GetTotalSeconds()));
 		//CTimeSpan delta = fileEndTimes[i] - startTime; // dist from end
 		//startSampleIds.push_back(100 * (unsigned long)(fileDurations[i].GetTotalSeconds() - delta.GetTotalSeconds()));
 	}
