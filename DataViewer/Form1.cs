@@ -116,7 +116,7 @@ namespace DataViewer {
                     g.DrawLines(pens[lineId], line.ToArray());
                     ++lineId;
                 }
-                {
+                { // Draw a legend in the bottom left
                     float margin = 15.0f;
                     float left = 30.0f;
                     float top = (float)bmp.Height - 180.0f;
