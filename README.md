@@ -2,9 +2,11 @@
 
 A C++ application that processes video to measure movement of persons within the field-of-view.
 
-[CAVAPA demo video (Gymnasium)](https://imgur.com/AoeUMwc)
+[![CAVAPA motion measurement from video](GregTrackCpp/cavapa.png)](https://imgur.com/AoeUMwc)
 
 This is part of a research project with Heidi Pasi, Taru Lintunen, Martin Hagger. Jyväskylä University (Finland).
+
+## Quickstart
 
 1.	Convert video to image frames using ffmpeg.
 `ffmpeg -i ./video.mpg -q:v 1 -qmin 1 -qmax 1 ./frames/video%06d.jpg`
@@ -13,7 +15,7 @@ This is part of a research project with Heidi Pasi, Taru Lintunen, Martin Hagger
 3.	Convert CAVAPA output image frames into a video using ffmpeg:
 `ffmpeg -i ./cavapa_output/movement%06d.jpg movement.mp4`
 
-## Summary
+## Technical Summary
 
 Cavapa is a command-line executable that is written in C++ for Microsoft Windows. Cavapa uses the following software libraries: 
 
