@@ -139,7 +139,7 @@ int main(int ac, char** av) {
 		("outputFolder,o", po::value<string>(), "output folder (optional)")
 		("bgThreshold,g", po::value<float>()->default_value(48.0f), "used to identify tracked pixels, lower values will be noisier")
 		("parallelChunkSize,p", po::value<int>()->default_value(128), "the number of files processed in parallel")
-		("blurIterations,b", po::value<int>()->default_value(3), "number of times the blur is applied")
+		("blurIterations,b", po::value<int>()->default_value(0), "number of times the blur is applied")
 		("csvDataFilenameOut,d", po::value<string>()->default_value("data.csv"), "output CSV data filename (path)")
 		;
 
