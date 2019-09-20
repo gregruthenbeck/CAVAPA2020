@@ -12,7 +12,7 @@ This is part of a research project with Heidi Pasi, Taru Lintunen, Martin Hagger
 `ffmpeg -i ./video.mpg -q:v 1 -qmin 1 -qmax 1 ./frames/video%06d.jpg`
 2.	Run CAVAPA. It will process the images and create movement images and a CSV data file (containing the movement-measure for each frame of the video).
 `cavapa -i ./frames -o ./cavapa_output`
-3.	Convert CAVAPA output image frames into a video using ffmpeg:
+3.	[optional] Convert CAVAPA output image frames into a video using ffmpeg:
 `ffmpeg -i ./cavapa_output/movement%06d.jpg movement.mp4`
 
 ## Technical Summary
