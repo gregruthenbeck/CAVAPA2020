@@ -90,8 +90,10 @@ concurrency::task<tuple<int, path, Image> > CreateForegroundMaskAsync(int index,
 		});
 }
 
-concurrency::task<tuple<int, double > > CreateAndSaveDeltaAsync(int index, bool skipSave, const path& outFilepath, const Image& imgA, const Image& imgB) {
-	return concurrency::create_task([index, skipSave, outFilepath, imgA, imgB] {
+concurrency::task<tuple<int, double > > CreateAndSaveDeltaAsync(const int index, bool skipSave, const path& outFilepath, 
+																const Image& imgA, const Image& imgB, 
+																const path& dbgOutFilepath, const int dbgOutInterval) {
+	return concurrency::create_task([index, skipSave, outFilepath, imgA, imgB, dbgOutFilepath, dbgOutInterval] {
 		if (!imgA.isValid() || !imgB.isValid()) {
 			return make_tuple(-1,0.0);
 		}
@@ -120,6 +122,21 @@ concurrency::task<tuple<int, double > > CreateAndSaveDeltaAsync(int index, bool 
 				if (!imgDD.save(outFilepath.string().c_str()))
 					throw(exception((stringstream("Error. Failed to save image: ") << outFilepath).str().c_str()));
 			}
+
+			if ((dbgOutInterval == 0 || (index % dbgOutInterval == 0)) &&
+				exists(dbgOutFilepath.parent_path()) && is_directory(dbgOutFilepath.parent_path())) {
+				if (!imgDD.isValid())
+					return make_tuple(-1, 0.0);
+
+				path imgADbgFilepath = dbgOutFilepath.parent_path().append(outFilepath.filename().string());
+
+				if (!imgA.save(imgADbgFilepath.string().c_str()))
+					throw(exception((stringstream("Error. Failed to save image: ") << imgADbgFilepath).str().c_str()));
+
+				if (!imgDD.save(dbgOutFilepath.string().c_str()))
+					throw(exception((stringstream("Error. Failed to save image: ") << dbgOutFilepath).str().c_str()));
+			}
+
 			return make_tuple(index, pixCount);
 		}
 		catch (std::exception const& e) {
@@ -248,7 +265,7 @@ int main(int ac, char** av) {
 						if (x.path().extension() != ".jpg") // must be jpg
 							return;
 
-						foregroundImageTasks.push_back(CreateForegroundMaskAsync(fileCount - 1, x.path(), imgBG, bgThreshSq, blurIterations));
+						foregroundImageTasks.push_back(CreateForegroundMaskAsync(fileCount - 1, x.path(), imgBG, bgThreshSq, blurIterations/*, dbgOutFilepath, dbgOutInterval*/));
 
 						if ((fileCount % chunkSize) == 0 || fileCount == numFiles) { // be careful with remainder in last chunk
 							vector<tuple<int, path, Image> > foregrounds;
@@ -267,8 +284,11 @@ int main(int ac, char** av) {
 								string outFilename = inPath.filename().string();
 								path outFilepath = outFolderPath;
 								outFilepath.append(outFilename);
+								path dbgOutFilepath = dbgOutFolderPath;
+								dbgOutFilepath.append(inPath.stem().filename().string());
+								dbgOutFilepath += "-dbg.jpg";
 								Image img = get<2>(t);
-								deltaImageTasks.push_back(CreateAndSaveDeltaAsync(fileCount - 1, skipImgOutput, outFilepath, prevImg, img));
+								deltaImageTasks.push_back(CreateAndSaveDeltaAsync(get<0>(t) /*fileCount - 1*/, skipImgOutput, outFilepath, prevImg, img, dbgOutFilepath, dbgOutInterval));
 								prevImg = img;
 							}
 							for (auto& t : deltaImageTasks) {
