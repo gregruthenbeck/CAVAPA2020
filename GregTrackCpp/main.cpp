@@ -67,7 +67,8 @@ concurrency::task<tuple<int, path, Image> > CreateForegroundMaskAsync(int index,
 					int g = ((int) * (srcA + 1)) - ((int) * (srcB + 1));
 					int b = ((int) * (srcA + 2)) - ((int) * (srcB + 2));
 					float deltaSq = (float)(r * r + g * g + b * b);
-					BYTE c = (deltaSq > bgThreshSq) ? 255 : 0;
+					//BYTE c = (deltaSq > bgThreshSq) ? 255 : 0;
+					BYTE c = (BYTE)min(255.0f, 255.0f*((deltaSq-bgThreshSq) / bgThreshSq));
 					//BYTE deltaByte = (BYTE)min(255.0f, delta);
 					*dst = c;
 					//*(dst + 1) = c;
@@ -89,8 +90,10 @@ concurrency::task<tuple<int, path, Image> > CreateForegroundMaskAsync(int index,
 		});
 }
 
-concurrency::task<tuple<int, double > > CreateAndSaveDeltaAsync(int index, bool skipSave, const path& outFilepath, const Image& imgA, const Image& imgB) {
-	return concurrency::create_task([index, skipSave, outFilepath, imgA, imgB] {
+concurrency::task<tuple<int, double > > CreateAndSaveDeltaAsync(const int index, bool skipSave, const path& outFilepath, 
+																const Image& imgA, const Image& imgB, 
+																const path& dbgOutFilepath, const int dbgOutInterval) {
+	return concurrency::create_task([index, skipSave, outFilepath, imgA, imgB, dbgOutFilepath, dbgOutInterval] {
 		if (!imgA.isValid() || !imgB.isValid()) {
 			return make_tuple(-1,0.0);
 		}
@@ -119,6 +122,21 @@ concurrency::task<tuple<int, double > > CreateAndSaveDeltaAsync(int index, bool 
 				if (!imgDD.save(outFilepath.string().c_str()))
 					throw(exception((stringstream("Error. Failed to save image: ") << outFilepath).str().c_str()));
 			}
+
+			if ((dbgOutInterval == 0 || (index % dbgOutInterval == 0)) &&
+				exists(dbgOutFilepath.parent_path()) && is_directory(dbgOutFilepath.parent_path())) {
+				if (!imgDD.isValid())
+					return make_tuple(-1, 0.0);
+
+				path imgADbgFilepath = dbgOutFilepath.parent_path().append(outFilepath.filename().string());
+
+				if (!imgA.save(imgADbgFilepath.string().c_str()))
+					throw(exception((stringstream("Error. Failed to save image: ") << imgADbgFilepath).str().c_str()));
+
+				if (!imgDD.save(dbgOutFilepath.string().c_str()))
+					throw(exception((stringstream("Error. Failed to save image: ") << dbgOutFilepath).str().c_str()));
+			}
+
 			return make_tuple(index, pixCount);
 		}
 		catch (std::exception const& e) {
@@ -137,6 +155,8 @@ int main(int ac, char** av) {
 		("help", "produce help message")
 		("inputFolder,i", po::value<string>(), "folder containing JPG files of video frames")
 		("outputFolder,o", po::value<string>(), "output folder (optional)")
+		("debugFolder,t", po::value<string>(), "debug output folder (optional)")
+		("dbgOutInterval,u", po::value<int>()->default_value(0), "number of frames skipped between debug output")
 		("bgThreshold,g", po::value<float>()->default_value(48.0f), "used to identify tracked pixels, lower values will be noisier")
 		("parallelChunkSize,p", po::value<int>()->default_value(128), "the number of files processed in parallel")
 		("blurIterations,b", po::value<int>()->default_value(0), "number of times the blur is applied")
@@ -162,16 +182,27 @@ int main(int ac, char** av) {
 		return EXIT_FAILURE;
 	}
 
-	string outFolder = "";
+	string outFolder = "", dbgOutFolder = "";
 	bool skipImgOutput = false;
-	path outFolderPath;
-	if (vm.count("outputFolder")) {
-		outFolder = vm["outputFolder"].as<string>();
-		cout << "Output images folder " << outFolder << "." << endl;
-		outFolderPath = outFolder.c_str();
-		if (!exists(outFolderPath) || !is_directory(outFolderPath)) {
-			cout << "Output folder must exist. Folder=" << outFolderPath << endl;
-			return EXIT_FAILURE;
+	path outFolderPath, dbgOutFolderPath;
+	if (vm.count("outputFolder") || vm.count("outputFolder")) {
+		if (vm.count("outputFolder")) {
+			outFolder = vm["outputFolder"].as<string>();
+			cout << "Output images folder " << outFolder << "." << endl;
+			outFolderPath = outFolder.c_str();
+			if (!exists(outFolderPath) || !is_directory(outFolderPath)) {
+				cout << "Output folder must exist. Folder=" << outFolderPath << endl;
+				return EXIT_FAILURE;
+			}
+		}
+		if (vm.count("debugFolder")) {
+			dbgOutFolder = vm["debugFolder"].as<string>();
+			cout << "Debug output images folder " << dbgOutFolder << "." << endl;
+			dbgOutFolderPath = dbgOutFolder.c_str();
+			if (!exists(dbgOutFolderPath) || !is_directory(dbgOutFolderPath)) {
+				cout << "Debug output folder must exist. Folder=" << dbgOutFolderPath << endl;
+				return EXIT_FAILURE;
+			}
 		}
 	}
 	else {
@@ -181,7 +212,8 @@ int main(int ac, char** av) {
 
 	const float bgThreshold = vm["bgThreshold"].as<float>();
 	const int chunkSize = vm["parallelChunkSize"].as<int>();
-	const int blueIterations = vm["blurIterations"].as<int>();
+	const int blurIterations = vm["blurIterations"].as<int>();
+	const int dbgOutInterval = vm["dbgOutInterval"].as<int>();
 	const string outCSVFilepath = vm["csvDataFilenameOut"].as<string>();
 
 	if (exists(outCSVFilepath)) { // delete the CSV if it exists
@@ -194,6 +226,11 @@ int main(int ac, char** av) {
 		// Clear the output folder (if we are not skipping the image output)
 		if (!skipImgOutput && exists(outFolderPath) && is_directory(outFolderPath)) {
 			for (directory_entry& x : directory_iterator(outFolderPath)) {
+				remove(x.path());
+			}
+		}
+		if (!skipImgOutput && exists(dbgOutFolderPath) && is_directory(dbgOutFolderPath)) {
+			for (directory_entry& x : directory_iterator(dbgOutFolderPath)) {
 				remove(x.path());
 			}
 		}
@@ -228,7 +265,7 @@ int main(int ac, char** av) {
 						if (x.path().extension() != ".jpg") // must be jpg
 							return;
 
-						foregroundImageTasks.push_back(CreateForegroundMaskAsync(fileCount - 1, x.path(), imgBG, bgThreshSq, blueIterations));
+						foregroundImageTasks.push_back(CreateForegroundMaskAsync(fileCount - 1, x.path(), imgBG, bgThreshSq, blurIterations/*, dbgOutFilepath, dbgOutInterval*/));
 
 						if ((fileCount % chunkSize) == 0 || fileCount == numFiles) { // be careful with remainder in last chunk
 							vector<tuple<int, path, Image> > foregrounds;
@@ -247,8 +284,11 @@ int main(int ac, char** av) {
 								string outFilename = inPath.filename().string();
 								path outFilepath = outFolderPath;
 								outFilepath.append(outFilename);
+								path dbgOutFilepath = dbgOutFolderPath;
+								dbgOutFilepath.append(inPath.stem().filename().string());
+								dbgOutFilepath += "-dbg.jpg";
 								Image img = get<2>(t);
-								deltaImageTasks.push_back(CreateAndSaveDeltaAsync(fileCount - 1, skipImgOutput, outFilepath, prevImg, img));
+								deltaImageTasks.push_back(CreateAndSaveDeltaAsync(get<0>(t) /*fileCount - 1*/, skipImgOutput, outFilepath, prevImg, img, dbgOutFilepath, dbgOutInterval));
 								prevImg = img;
 							}
 							for (auto& t : deltaImageTasks) {
