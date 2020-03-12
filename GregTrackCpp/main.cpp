@@ -68,6 +68,7 @@ concurrency::task<tuple<int, path, Image> > CreateForegroundMaskAsync(int index,
 					int b = ((int) * (srcA + 2)) - ((int) * (srcB + 2));
 					float deltaSq = (float)(r * r + g * g + b * b);
 					//BYTE c = (deltaSq > bgThreshSq) ? 255 : 0;
+					//BYTE c = ((abs(r) > bgThresh && abs(g) > bgThresh && abs(b) > bgThresh) ? (r+g+b)/3 : 0);
 					BYTE c = (BYTE)min(255.0f, 255.0f*((deltaSq-bgThreshSq) / bgThreshSq));
 					//BYTE deltaByte = (BYTE)min(255.0f, delta);
 					*dst = c;
