@@ -92,6 +92,9 @@ namespace Cavapa_dotNet_Prototype
             statusLabel.Text = "Processing: Done!";
         }
 
+        /// <summary>
+        /// Displays a Violet image when successful (red + blue)
+        /// </summary>
         private void TestComputeAverage() {
             Bitmap a = new Bitmap(1080, 720, PixelFormat.Format24bppRgb);
             Bitmap b = new Bitmap(1080, 720, PixelFormat.Format24bppRgb);
