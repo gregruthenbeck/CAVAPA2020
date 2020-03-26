@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.statusProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
@@ -38,13 +39,13 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBoxObsInterval = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxFps = new System.Windows.Forms.TextBox();
             this.labelFps = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
+            this.labelDuration = new System.Windows.Forms.Label();
+            this.labelTime = new System.Windows.Forms.Label();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -59,7 +60,6 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectFramesInputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.statusProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -89,6 +89,12 @@
             this.statusStrip1.Size = new System.Drawing.Size(1278, 22);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // statusProgressBar
+            // 
+            this.statusProgressBar.Name = "statusProgressBar";
+            this.statusProgressBar.Size = new System.Drawing.Size(300, 16);
+            this.statusProgressBar.Visible = false;
             // 
             // statusLabel
             // 
@@ -168,13 +174,14 @@
             this.trackBar1.Name = "trackBar1";
             this.trackBar1.Size = new System.Drawing.Size(869, 34);
             this.trackBar1.TabIndex = 0;
+            this.trackBar1.ValueChanged += new System.EventHandler(this.trackBar1_ValueChanged);
             // 
             // panel1
             // 
             this.panel1.AllowDrop = true;
             this.panel1.Controls.Add(this.label5);
             this.panel1.Controls.Add(this.label4);
-            this.panel1.Controls.Add(this.textBox1);
+            this.panel1.Controls.Add(this.textBoxObsInterval);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.textBoxFps);
             this.panel1.Controls.Add(this.labelFps);
@@ -202,14 +209,14 @@
             this.label4.TabIndex = 4;
             this.label4.Text = "Hz";
             // 
-            // textBox1
+            // textBoxObsInterval
             // 
-            this.textBox1.Location = new System.Drawing.Point(116, 29);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(32, 20);
-            this.textBox1.TabIndex = 3;
-            this.textBox1.Text = "5";
-            this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.textBoxObsInterval.Location = new System.Drawing.Point(116, 29);
+            this.textBoxObsInterval.Name = "textBoxObsInterval";
+            this.textBoxObsInterval.Size = new System.Drawing.Size(32, 20);
+            this.textBoxObsInterval.TabIndex = 3;
+            this.textBoxObsInterval.Text = "5";
+            this.textBoxObsInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // label3
             // 
@@ -242,34 +249,34 @@
             // 
             // panel2
             // 
-            this.panel2.Controls.Add(this.label2);
-            this.panel2.Controls.Add(this.label1);
+            this.panel2.Controls.Add(this.labelDuration);
+            this.panel2.Controls.Add(this.labelTime);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(440, 43);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(432, 100);
             this.panel2.TabIndex = 2;
             // 
-            // label2
+            // labelDuration
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(264, 14);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(71, 13);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "/ 0:00:00.00s";
+            this.labelDuration.AutoSize = true;
+            this.labelDuration.Location = new System.Drawing.Point(264, 14);
+            this.labelDuration.Name = "labelDuration";
+            this.labelDuration.Size = new System.Drawing.Size(71, 13);
+            this.labelDuration.TabIndex = 1;
+            this.labelDuration.Text = "/ 0:00:00.00s";
             // 
-            // label1
+            // labelTime
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(154, 6);
-            this.label1.Name = "label1";
-            this.label1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.label1.Size = new System.Drawing.Size(104, 24);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "0:00:00.00s";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.labelTime.AutoSize = true;
+            this.labelTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelTime.Location = new System.Drawing.Point(154, 6);
+            this.labelTime.Name = "labelTime";
+            this.labelTime.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.labelTime.Size = new System.Drawing.Size(104, 24);
+            this.labelTime.TabIndex = 0;
+            this.labelTime.Text = "0:00:00.00s";
+            this.labelTime.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // tableLayoutPanel2
             // 
@@ -387,12 +394,6 @@
             this.closeToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             // 
-            // toolStripProgressBar1
-            // 
-            this.statusProgressBar.Name = "toolStripProgressBar1";
-            this.statusProgressBar.Size = new System.Drawing.Size(300, 16);
-            this.statusProgressBar.Visible = false;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -458,13 +459,13 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBoxObsInterval;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBoxFps;
         private System.Windows.Forms.Label labelFps;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelDuration;
+        private System.Windows.Forms.Label labelTime;
         private System.Windows.Forms.ToolStripProgressBar statusProgressBar;
     }
 }

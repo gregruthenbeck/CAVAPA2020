@@ -16,6 +16,7 @@ namespace Cavapa_Observation_Score
         string inputFolder;
         string[] inputFramesFilepaths;
         List<Bitmap> frames;
+        int obsInterval = 1;
         public MainForm()
         {
             InitializeComponent();
@@ -48,8 +49,32 @@ namespace Cavapa_Observation_Score
 
                     statusProgressBar.Visible = false;
                     statusLabel.Text = frames.Count.ToString() + " frames loaded";
+
+                    obsInterval = int.Parse(textBoxObsInterval.Text) * int.Parse(textBoxFps.Text);
+
+                    trackBar1.Maximum = frames.Count - 1;
+                    trackBar1.Value = 0;
+                    trackBar1.TickFrequency = obsInterval;
+                    trackBar1.LargeChange = obsInterval;
+
+                    dataGridView1.Rows.Add((int)(0.5f + (float)frames.Count / (float)obsInterval) - 1); // already have 1 row
+
+                    pictureBox1.Image = frames[0];
                 }
             }
+        }
+
+        private void trackBar1_ValueChanged(object sender, EventArgs e)
+        {
+            pictureBox1.Image = frames[trackBar1.Value];
+            int row = trackBar1.Value / obsInterval;
+            if (row > 0) {
+                dataGridView1.Rows[row - 1].Selected = false;
+            }
+            if (row < (dataGridView1.Rows.Count-1)) {
+                dataGridView1.Rows[row + 1].Selected = false;
+            }
+            dataGridView1.Rows[row].Selected = true;
         }
     }
 }
