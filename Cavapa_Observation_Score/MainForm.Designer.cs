@@ -50,6 +50,7 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.labelDuration = new System.Windows.Forms.Label();
             this.labelTime = new System.Windows.Forms.Label();
+            this.trackBarTime = new System.Windows.Forms.TrackBar();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -64,7 +65,8 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectFramesInputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.trackBarTime = new System.Windows.Forms.TrackBar();
+            this.labelLoopSpeed = new System.Windows.Forms.Label();
+            this.textBoxLoopSpeed = new System.Windows.Forms.TextBox();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -79,10 +81,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarTime)).BeginInit();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBarTime)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -152,6 +154,7 @@
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(875, 650);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
@@ -160,16 +163,16 @@
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Controls.Add(this.trackBar1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.trackBar1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.panel2, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.trackBarTime, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.trackBarTime, 0, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.Size = new System.Drawing.Size(875, 176);
             this.tableLayoutPanel1.TabIndex = 0;
@@ -178,15 +181,18 @@
             // 
             this.tableLayoutPanel1.SetColumnSpan(this.trackBar1, 2);
             this.trackBar1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.trackBar1.Location = new System.Drawing.Point(3, 3);
+            this.trackBar1.Location = new System.Drawing.Point(3, 20);
+            this.trackBar1.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(869, 34);
+            this.trackBar1.Size = new System.Drawing.Size(869, 37);
             this.trackBar1.TabIndex = 0;
             this.trackBar1.ValueChanged += new System.EventHandler(this.trackBar1_ValueChanged);
             // 
             // panel1
             // 
             this.panel1.AllowDrop = true;
+            this.panel1.Controls.Add(this.textBoxLoopSpeed);
+            this.panel1.Controls.Add(this.labelLoopSpeed);
             this.panel1.Controls.Add(this.buttonPlayLoop);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.textBoxLoopInterval);
@@ -230,6 +236,7 @@
             this.textBoxLoopInterval.TabIndex = 7;
             this.textBoxLoopInterval.Text = "5";
             this.textBoxLoopInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.textBoxLoopInterval.TextChanged += new System.EventHandler(this.textBoxLoopInterval_TextChanged);
             // 
             // label2
             // 
@@ -327,6 +334,18 @@
             this.labelTime.TabIndex = 0;
             this.labelTime.Text = "0:00:00.00s";
             this.labelTime.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // trackBarTime
+            // 
+            this.tableLayoutPanel1.SetColumnSpan(this.trackBarTime, 2);
+            this.trackBarTime.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.trackBarTime.Enabled = false;
+            this.trackBarTime.Location = new System.Drawing.Point(8, 3);
+            this.trackBarTime.Margin = new System.Windows.Forms.Padding(8, 3, 8, 0);
+            this.trackBarTime.Name = "trackBarTime";
+            this.trackBarTime.Size = new System.Drawing.Size(859, 17);
+            this.trackBarTime.TabIndex = 3;
+            this.trackBarTime.TickStyle = System.Windows.Forms.TickStyle.None;
             // 
             // tableLayoutPanel2
             // 
@@ -444,17 +463,24 @@
             this.closeToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             // 
-            // trackBarTime
+            // labelLoopSpeed
             // 
-            this.tableLayoutPanel1.SetColumnSpan(this.trackBarTime, 2);
-            this.trackBarTime.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.trackBarTime.Enabled = false;
-            this.trackBarTime.Location = new System.Drawing.Point(8, 43);
-            this.trackBarTime.Margin = new System.Windows.Forms.Padding(8, 3, 8, 3);
-            this.trackBarTime.Name = "trackBarTime";
-            this.trackBarTime.Size = new System.Drawing.Size(859, 14);
-            this.trackBarTime.TabIndex = 3;
-            this.trackBarTime.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.labelLoopSpeed.AutoSize = true;
+            this.labelLoopSpeed.Location = new System.Drawing.Point(306, 57);
+            this.labelLoopSpeed.Name = "labelLoopSpeed";
+            this.labelLoopSpeed.Size = new System.Drawing.Size(44, 13);
+            this.labelLoopSpeed.TabIndex = 10;
+            this.labelLoopSpeed.Text = "speed x";
+            // 
+            // textBoxLoopSpeed
+            // 
+            this.textBoxLoopSpeed.Location = new System.Drawing.Point(356, 54);
+            this.textBoxLoopSpeed.Name = "textBoxLoopSpeed";
+            this.textBoxLoopSpeed.Size = new System.Drawing.Size(39, 20);
+            this.textBoxLoopSpeed.TabIndex = 11;
+            this.textBoxLoopSpeed.Text = "2.0";
+            this.textBoxLoopSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.textBoxLoopSpeed.TextChanged += new System.EventHandler(this.textBoxLoopSpeed_TextChanged);
             // 
             // MainForm
             // 
@@ -486,11 +512,11 @@
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarTime)).EndInit();
             this.tableLayoutPanel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBarTime)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -535,6 +561,8 @@
         private System.Windows.Forms.TextBox textBoxLoopInterval;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TrackBar trackBarTime;
+        private System.Windows.Forms.TextBox textBoxLoopSpeed;
+        private System.Windows.Forms.Label labelLoopSpeed;
     }
 }
 

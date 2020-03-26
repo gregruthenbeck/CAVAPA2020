@@ -54,7 +54,7 @@ namespace Cavapa_Observation_Score
                     statusProgressBar.Visible = false;
                     statusLabel.Text = frames.Count.ToString() + " frames loaded";
 
-                    loopFrameTimer.Interval = 1000 / int.Parse(textBoxFps.Text);
+                    textBoxLoopSpeed_TextChanged(this, null);
                     obsInterval = int.Parse(textBoxObsInterval.Text) * int.Parse(textBoxFps.Text);
                     loopInterval = int.Parse(textBoxLoopInterval.Text) * int.Parse(textBoxFps.Text);
 
@@ -104,6 +104,16 @@ namespace Cavapa_Observation_Score
         {
             loopFrameOffset = 0;
             loopFrameTimer.Enabled = !loopFrameTimer.Enabled;
+        }
+
+        private void textBoxLoopSpeed_TextChanged(object sender, EventArgs e)
+        {
+            loopFrameTimer.Interval = (int)(1000.0f / ((float)int.Parse(textBoxFps.Text) * float.Parse(textBoxLoopSpeed.Text)));
+        }
+
+        private void textBoxLoopInterval_TextChanged(object sender, EventArgs e)
+        {
+            textBoxLoopSpeed_TextChanged(this, null);
         }
     }
 }
