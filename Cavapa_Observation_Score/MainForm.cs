@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Office.Interop;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Cavapa_Observation_Score
 {
@@ -66,6 +69,17 @@ namespace Cavapa_Observation_Score
                     trackBar1.LargeChange = obsInterval;
 
                     dataGridView1.Rows.Add((int)(0.5f + (float)frames.Count / (float)obsInterval) - 1); // already have 1 row
+                    foreach (DataGridViewColumn col in dataGridView1.Columns)
+                    {
+                        col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.BottomRight;
+                    }
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        int id = (row.Index + 1);
+                        row.Cells[0].Value = id;
+                        TimeSpan time = new TimeSpan((long)(10000 * id * obsInterval * (1000 / int.Parse(textBoxFps.Text))));
+                        row.Cells[1].Value = time;
+                    }
 
                     pictureBox1.Image = frames[0];
                 }
@@ -104,6 +118,7 @@ namespace Cavapa_Observation_Score
         {
             loopFrameOffset = 0;
             loopFrameTimer.Enabled = !loopFrameTimer.Enabled;
+            buttonPlayLoop.BackColor = (loopFrameTimer.Enabled ? Color.LightGreen : Color.LightGray);
         }
 
         private void textBoxLoopSpeed_TextChanged(object sender, EventArgs e)
@@ -114,6 +129,71 @@ namespace Cavapa_Observation_Score
         private void textBoxLoopInterval_TextChanged(object sender, EventArgs e)
         {
             textBoxLoopSpeed_TextChanged(this, null);
+        }
+
+        private void buttonOpenInExcel_Click(object sender, EventArgs e)
+        {
+            string csvFilepath = "cavapa_obs.csv";
+            using (TextWriter file = File.CreateText(csvFilepath))
+            {
+                string line = "";
+                foreach (DataGridViewColumn col in dataGridView1.Columns)
+                {
+                    line += "\"" + col.HeaderText + "\",";
+                }
+                file.WriteLine(line);
+                line = "";
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        if (cell.Value == null)
+                        {
+                            line += ",";
+                            continue;
+                        }
+                        line += cell.Value.ToString() + ",";
+                    }
+                    file.WriteLine(line);
+                    line = "";
+                }
+                file.Flush();
+                file.Close();
+            }
+
+            Process proc = new Process();
+            proc.StartInfo = new ProcessStartInfo("excel.exe", csvFilepath);
+            proc.Start();
+
+            //var excelApp = new Excel.Application();
+            //// Make the object visible.
+            //excelApp.Visible = true;
+
+            //// Create a new, empty workbook and add it to the collection returned 
+            //// by property Workbooks. The new workbook becomes the active workbook.
+            //// Add has an optional parameter for specifying a praticular template. 
+            //// Because no argument is sent in this example, Add creates a new workbook. 
+            //excelApp.Workbooks.Add();
+
+            //// This example uses a single workSheet. The explicit type casting is
+            //// removed in a later procedure.
+            //Excel._Worksheet workSheet = (Excel.Worksheet)excelApp.ActiveSheet;
+
+            //foreach (DataGridViewColumn col in dataGridView1.Columns)
+            //{
+            //    workSheet.Cells[1, col.Index] = col.HeaderText;
+            //}
+
+            ////var row = 1;
+            ////foreach (var acct in accounts)
+            ////{
+            ////    row++;
+            ////    workSheet.Cells[row, "A"] = acct.ID;
+            ////    workSheet.Cells[row, "B"] = acct.Balance;
+            ////}
+
+            //workSheet.Columns[1].AutoFit();
+            //workSheet.Columns[2].AutoFit();
         }
     }
 }
