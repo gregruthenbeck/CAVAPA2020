@@ -347,10 +347,10 @@
             this.tableLayoutPanel1.SetColumnSpan(this.trackBarTime, 2);
             this.trackBarTime.Dock = System.Windows.Forms.DockStyle.Fill;
             this.trackBarTime.Enabled = false;
-            this.trackBarTime.Location = new System.Drawing.Point(8, 3);
-            this.trackBarTime.Margin = new System.Windows.Forms.Padding(8, 3, 5, 0);
+            this.trackBarTime.Location = new System.Drawing.Point(5, 3);
+            this.trackBarTime.Margin = new System.Windows.Forms.Padding(5, 3, 5, 0);
             this.trackBarTime.Name = "trackBarTime";
-            this.trackBarTime.Size = new System.Drawing.Size(959, 17);
+            this.trackBarTime.Size = new System.Drawing.Size(962, 17);
             this.trackBarTime.TabIndex = 3;
             this.trackBarTime.TickStyle = System.Windows.Forms.TickStyle.None;
             // 

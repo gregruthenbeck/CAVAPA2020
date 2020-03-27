@@ -62,6 +62,8 @@ namespace Cavapa_Observation_Score
                     loopInterval = int.Parse(textBoxLoopInterval.Text) * int.Parse(textBoxFps.Text);
 
                     trackBarTime.Maximum = frames.Count - 1;
+                    TimeSpan duration = new TimeSpan((long)(10000 * frames.Count * (1000 / int.Parse(textBoxFps.Text))));
+                    labelDuration.Text = duration.ToString() + "s";
 
                     trackBar1.Maximum = frames.Count - 1;
                     trackBar1.Value = 0;
@@ -77,7 +79,7 @@ namespace Cavapa_Observation_Score
                     {
                         int id = (row.Index + 1);
                         row.Cells[0].Value = id;
-                        TimeSpan time = new TimeSpan((long)(10000 * id * obsInterval * (1000 / int.Parse(textBoxFps.Text))));
+                        TimeSpan time = new TimeSpan((long)(10000 * row.Index * obsInterval * (1000 / int.Parse(textBoxFps.Text))));
                         row.Cells[1].Value = time;
                     }
 
@@ -102,6 +104,8 @@ namespace Cavapa_Observation_Score
 
         private void trackBar1_ValueChanged(object sender, EventArgs e)
         {
+            TimeSpan time = new TimeSpan((long)(10000 * trackBar1.Value * obsInterval * (1000 / int.Parse(textBoxFps.Text))));
+            labelTime.Text = time.ToString();
             pictureBox1.Image = frames[trackBar1.Value];
             trackBarTime.Value = trackBar1.Value;
             int row = trackBar1.Value / obsInterval;
