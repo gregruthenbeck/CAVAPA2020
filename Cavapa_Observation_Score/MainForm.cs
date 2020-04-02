@@ -26,6 +26,7 @@ namespace Cavapa_Observation_Score
         int obsInterval = 1;
         int loopInterval = 1;
         int loopFrameOffset = 0;
+        int framesPerSecond = 25;
         Timer loopFrameTimer = new Timer();
         TrimmingMemoryCache memoryCache;
         ObjectCache frameCache;
@@ -92,11 +93,11 @@ namespace Cavapa_Observation_Score
                     //statusLabel.Text = frames.Count.ToString() + " frames loaded";
 
                     textBoxLoopSpeed_TextChanged(this, null);
-                    obsInterval = int.Parse(textBoxObsInterval.Text) * int.Parse(textBoxFps.Text);
-                    loopInterval = int.Parse(textBoxLoopInterval.Text) * int.Parse(textBoxFps.Text);
+                    obsInterval = int.Parse(textBoxObsInterval.Text) * framesPerSecond;
+                    loopInterval = int.Parse(textBoxLoopInterval.Text) * framesPerSecond;
 
                     trackBarTime.Maximum = framesFilenames.Length - 1;
-                    TimeSpan duration = new TimeSpan(10000L * (long)framesFilenames.Length * (1000L / long.Parse(textBoxFps.Text)));
+                    TimeSpan duration = new TimeSpan(10000L * (long)framesFilenames.Length * (1000L / (long)framesPerSecond));
                     labelDuration.Text = duration.ToString("hh':'mm':'ss'.'ff") + "s";
 
                     trackBar1.Maximum = framesFilenames.Length - 1;
@@ -113,7 +114,7 @@ namespace Cavapa_Observation_Score
                     {
                         int id = (row.Index + 1);
                         row.Cells[0].Value = id;
-                        long ticks = 10000L * (long)row.Index * (long)obsInterval * (1000L / long.Parse(textBoxFps.Text));
+                        long ticks = 10000L * (long)row.Index * (long)obsInterval * (1000L / (long)framesPerSecond);
                         TimeSpan time = new TimeSpan(ticks);
                         row.Cells[1].Value = time;
                     }
@@ -126,6 +127,9 @@ namespace Cavapa_Observation_Score
 
         private void LoopFrameTimer_Tick(object sender, EventArgs e)
         {
+            if (framesFilenames == null)
+                return;
+
             ++loopFrameOffset;
             if (loopFrameOffset == loopInterval)
                 loopFrameOffset = 0;
@@ -153,7 +157,7 @@ namespace Cavapa_Observation_Score
         private void trackBar1_ValueChanged(object sender, EventArgs e)
         {
             //TimeSpan time = new TimeSpan(10000L * (long)trackBar1.Value * (long)obsInterval * (1000L / long.Parse(textBoxFps.Text)));
-            TimeSpan time = new TimeSpan(10000L * (long)trackBar1.Value * (1000L / long.Parse(textBoxFps.Text)));
+            TimeSpan time = new TimeSpan(10000L * (long)trackBar1.Value * (1000L / (long)framesPerSecond));
             labelTime.Text = time.ToString("hh':'mm':'ss'.'ff");
             labelFrameCounter.Text = "Frame:  " + trackBar1.Value.ToString() + "/" + trackBar1.Maximum.ToString();
 
@@ -181,25 +185,6 @@ namespace Cavapa_Observation_Score
             loopFrameOffset = 0;
             loopFrameTimer.Enabled = !loopFrameTimer.Enabled;
             buttonPlayLoop.BackColor = (loopFrameTimer.Enabled ? Color.LightGreen : Color.LightGray);
-        }
-
-        private void textBoxLoopSpeed_TextChanged(object sender, EventArgs e)
-        {
-            float loopSpeed = 1.0f;
-            if (float.TryParse(textBoxLoopSpeed.Text, out loopSpeed) &&
-                (loopSpeed > 0.1f && loopSpeed < 20.0f))
-            {
-                textBoxLoopSpeed.BackColor = Color.White;
-                loopFrameTimer.Interval = (int)(1000.0f / ((float)int.Parse(textBoxFps.Text) * loopSpeed));
-            }
-            else {
-                textBoxLoopSpeed.BackColor = Color.Pink;
-            }
-        }
-
-        private void textBoxLoopInterval_TextChanged(object sender, EventArgs e)
-        {
-            textBoxLoopSpeed_TextChanged(this, null);
         }
 
         private void buttonOpenInExcel_Click(object sender, EventArgs e)
@@ -265,6 +250,66 @@ namespace Cavapa_Observation_Score
 
             //workSheet.Columns[1].AutoFit();
             //workSheet.Columns[2].AutoFit();
+        }
+
+        private void textBoxFps_TextChanged(object sender, EventArgs e)
+        {
+            int fps = framesPerSecond;
+            if (int.TryParse(textBoxFps.Text, out fps) &&
+                (fps > 1 && fps < 200))
+            {
+                framesPerSecond = fps;
+                textBoxFps.BackColor = Color.White;
+            }
+            else {
+                textBoxFps.BackColor = Color.Pink;
+            }
+        }
+
+        private void textBoxObsInterval_TextChanged(object sender, EventArgs e)
+        {
+            int oin = obsInterval;
+            if (int.TryParse(textBoxObsInterval.Text, out oin) &&
+                (oin > 1 && oin < 200))
+            {
+                obsInterval = oin;
+                textBoxObsInterval.BackColor = Color.White;
+            }
+            else
+            {
+                textBoxObsInterval.BackColor = Color.Pink;
+            }
+        }
+
+        private void textBoxLoopSpeed_TextChanged(object sender, EventArgs e)
+        {
+            float loopSpeed = 1.0f;
+            if (float.TryParse(textBoxLoopSpeed.Text, out loopSpeed) &&
+                (loopSpeed > 0.1f && loopSpeed < 20.0f))
+            {
+                textBoxLoopSpeed.BackColor = Color.White;
+                loopFrameTimer.Interval = (int)(1000.0f / ((float)framesPerSecond * loopSpeed));
+            }
+            else
+            {
+                textBoxLoopSpeed.BackColor = Color.Pink;
+            }
+        }
+
+        private void textBoxLoopInterval_TextChanged(object sender, EventArgs e)
+        {
+            int lin = loopInterval / framesPerSecond;
+            if (int.TryParse(textBoxLoopInterval.Text, out lin) &&
+                (lin > 1 && lin < 200))
+            {
+                loopInterval = lin * framesPerSecond;
+                textBoxLoopInterval.BackColor = Color.White;
+                textBoxLoopSpeed_TextChanged(this, null);
+            }
+            else
+            {
+                textBoxLoopInterval.BackColor = Color.Pink;
+            }
         }
     }
 }

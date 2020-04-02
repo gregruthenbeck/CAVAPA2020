@@ -50,6 +50,7 @@
             this.textBoxFps = new System.Windows.Forms.TextBox();
             this.labelFps = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.labelFrameCounter = new System.Windows.Forms.Label();
             this.labelDuration = new System.Windows.Forms.Label();
             this.labelTime = new System.Windows.Forms.Label();
             this.trackBarTime = new System.Windows.Forms.TrackBar();
@@ -73,7 +74,6 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectFramesInputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.labelFrameCounter = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -301,6 +301,7 @@
             this.textBoxObsInterval.TabIndex = 3;
             this.textBoxObsInterval.Text = "5";
             this.textBoxObsInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.textBoxObsInterval.TextChanged += new System.EventHandler(this.textBoxObsInterval_TextChanged);
             // 
             // label3
             // 
@@ -320,6 +321,7 @@
             this.textBoxFps.TabIndex = 1;
             this.textBoxFps.Text = "25";
             this.textBoxFps.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.textBoxFps.TextChanged += new System.EventHandler(this.textBoxFps_TextChanged);
             // 
             // labelFps
             // 
@@ -341,6 +343,19 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(480, 110);
             this.panel2.TabIndex = 2;
+            // 
+            // labelFrameCounter
+            // 
+            this.labelFrameCounter.AutoSize = true;
+            this.labelFrameCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelFrameCounter.ForeColor = System.Drawing.SystemColors.ControlDark;
+            this.labelFrameCounter.Location = new System.Drawing.Point(154, 32);
+            this.labelFrameCounter.Name = "labelFrameCounter";
+            this.labelFrameCounter.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.labelFrameCounter.Size = new System.Drawing.Size(79, 18);
+            this.labelFrameCounter.TabIndex = 2;
+            this.labelFrameCounter.Text = "Frame: 0/0";
+            this.labelFrameCounter.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // labelDuration
             // 
@@ -542,19 +557,6 @@
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
             this.closeToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.closeToolStripMenuItem.Text = "&Close";
-            // 
-            // labelFrameCounter
-            // 
-            this.labelFrameCounter.AutoSize = true;
-            this.labelFrameCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelFrameCounter.ForeColor = System.Drawing.SystemColors.ControlDark;
-            this.labelFrameCounter.Location = new System.Drawing.Point(154, 32);
-            this.labelFrameCounter.Name = "labelFrameCounter";
-            this.labelFrameCounter.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.labelFrameCounter.Size = new System.Drawing.Size(79, 18);
-            this.labelFrameCounter.TabIndex = 2;
-            this.labelFrameCounter.Text = "Frame: 0/0";
-            this.labelFrameCounter.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // MainForm
             // 
