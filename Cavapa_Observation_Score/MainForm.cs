@@ -70,6 +70,7 @@ namespace Cavapa_Observation_Score
 
                 if (ofd.ShowDialog() == DialogResult.OK) {
                     inputFolder = Path.GetDirectoryName(ofd.FileName);
+                    this.Text = "VOST - Video Observational Scoring Tool - Greg Ruthenbeck © 2020 - " + inputFolder;
                     inputFramesFilepaths = Directory.GetFiles(inputFolder, "*.jp*g");
 
                     //statusProgressBar.Maximum = inputFramesFilepaths.Length;
@@ -95,7 +96,7 @@ namespace Cavapa_Observation_Score
                     loopInterval = int.Parse(textBoxLoopInterval.Text) * int.Parse(textBoxFps.Text);
 
                     trackBarTime.Maximum = framesFilenames.Length - 1;
-                    TimeSpan duration = new TimeSpan((long)(10000 * framesFilenames.Length * (1000 / int.Parse(textBoxFps.Text))));
+                    TimeSpan duration = new TimeSpan(10000L * (long)framesFilenames.Length * (1000L / long.Parse(textBoxFps.Text)));
                     labelDuration.Text = duration.ToString() + "s";
 
                     trackBar1.Maximum = framesFilenames.Length - 1;
@@ -112,7 +113,8 @@ namespace Cavapa_Observation_Score
                     {
                         int id = (row.Index + 1);
                         row.Cells[0].Value = id;
-                        TimeSpan time = new TimeSpan((long)(10000 * row.Index * obsInterval * (1000 / int.Parse(textBoxFps.Text))));
+                        long ticks = 10000L * (long)row.Index * (long)obsInterval * (1000L / long.Parse(textBoxFps.Text));
+                        TimeSpan time = new TimeSpan(ticks);
                         row.Cells[1].Value = time;
                     }
 
@@ -150,7 +152,7 @@ namespace Cavapa_Observation_Score
 
         private void trackBar1_ValueChanged(object sender, EventArgs e)
         {
-            TimeSpan time = new TimeSpan((long)(10000 * trackBar1.Value * obsInterval * (1000 / int.Parse(textBoxFps.Text))));
+            TimeSpan time = new TimeSpan(10000L * (long)trackBar1.Value * (long)obsInterval * (1000L / long.Parse(textBoxFps.Text)));
             labelTime.Text = time.ToString();
 
             //pictureBox1.Image = frames[trackBar1.Value];

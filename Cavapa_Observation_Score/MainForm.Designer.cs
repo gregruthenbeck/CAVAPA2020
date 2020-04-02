@@ -551,7 +551,7 @@
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
-            this.Text = " Video Observational Scoring Tool - Greg Ruthenbeck © 2020";
+            this.Text = "VOST - Video Observational Scoring Tool - Greg Ruthenbeck © 2020";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
