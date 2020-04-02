@@ -37,6 +37,8 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.textBoxLoopSpeed = new System.Windows.Forms.TextBox();
+            this.labelLoopSpeed = new System.Windows.Forms.Label();
             this.buttonPlayLoop = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxLoopInterval = new System.Windows.Forms.TextBox();
@@ -53,14 +55,6 @@
             this.trackBarTime = new System.Windows.Forms.TrackBar();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.selectFramesInputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.labelLoopSpeed = new System.Windows.Forms.Label();
-            this.textBoxLoopSpeed = new System.Windows.Forms.TextBox();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.buttonOpenInExcel = new System.Windows.Forms.Button();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -73,6 +67,12 @@
             this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.buttonOpenInExcel = new System.Windows.Forms.Button();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectFramesInputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -90,8 +90,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBarTime)).BeginInit();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            this.menuStrip1.SuspendLayout();
             this.panel3.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -215,6 +215,25 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(480, 110);
             this.panel1.TabIndex = 1;
+            // 
+            // textBoxLoopSpeed
+            // 
+            this.textBoxLoopSpeed.Location = new System.Drawing.Point(356, 54);
+            this.textBoxLoopSpeed.Name = "textBoxLoopSpeed";
+            this.textBoxLoopSpeed.Size = new System.Drawing.Size(39, 20);
+            this.textBoxLoopSpeed.TabIndex = 11;
+            this.textBoxLoopSpeed.Text = "2.0";
+            this.textBoxLoopSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.textBoxLoopSpeed.TextChanged += new System.EventHandler(this.textBoxLoopSpeed_TextChanged);
+            // 
+            // labelLoopSpeed
+            // 
+            this.labelLoopSpeed.AutoSize = true;
+            this.labelLoopSpeed.Location = new System.Drawing.Point(306, 57);
+            this.labelLoopSpeed.Name = "labelLoopSpeed";
+            this.labelLoopSpeed.Size = new System.Drawing.Size(44, 13);
+            this.labelLoopSpeed.TabIndex = 10;
+            this.labelLoopSpeed.Text = "speed x";
             // 
             // buttonPlayLoop
             // 
@@ -394,77 +413,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(601, 664);
             this.dataGridView1.TabIndex = 1;
-            // 
-            // menuStrip1
-            // 
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1577, 24);
-            this.menuStrip1.TabIndex = 2;
-            this.menuStrip1.Text = "menuStrip1";
-            // 
-            // fileToolStripMenuItem
-            // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectFramesInputFolderToolStripMenuItem,
-            this.closeToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "&File";
-            // 
-            // selectFramesInputFolderToolStripMenuItem
-            // 
-            this.selectFramesInputFolderToolStripMenuItem.Name = "selectFramesInputFolderToolStripMenuItem";
-            this.selectFramesInputFolderToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
-            this.selectFramesInputFolderToolStripMenuItem.Text = "Select Frames &Input Folder";
-            this.selectFramesInputFolderToolStripMenuItem.Click += new System.EventHandler(this.selectFramesInputFolderToolStripMenuItem_Click);
-            // 
-            // closeToolStripMenuItem
-            // 
-            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
-            this.closeToolStripMenuItem.Text = "&Close";
-            // 
-            // labelLoopSpeed
-            // 
-            this.labelLoopSpeed.AutoSize = true;
-            this.labelLoopSpeed.Location = new System.Drawing.Point(306, 57);
-            this.labelLoopSpeed.Name = "labelLoopSpeed";
-            this.labelLoopSpeed.Size = new System.Drawing.Size(44, 13);
-            this.labelLoopSpeed.TabIndex = 10;
-            this.labelLoopSpeed.Text = "speed x";
-            // 
-            // textBoxLoopSpeed
-            // 
-            this.textBoxLoopSpeed.Location = new System.Drawing.Point(356, 54);
-            this.textBoxLoopSpeed.Name = "textBoxLoopSpeed";
-            this.textBoxLoopSpeed.Size = new System.Drawing.Size(39, 20);
-            this.textBoxLoopSpeed.TabIndex = 11;
-            this.textBoxLoopSpeed.Text = "2.0";
-            this.textBoxLoopSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.textBoxLoopSpeed.TextChanged += new System.EventHandler(this.textBoxLoopSpeed_TextChanged);
-            // 
-            // panel3
-            // 
-            this.panel3.Controls.Add(this.buttonOpenInExcel);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(0, 664);
-            this.panel3.Margin = new System.Windows.Forms.Padding(0);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(300, 166);
-            this.panel3.TabIndex = 2;
-            // 
-            // buttonOpenInExcel
-            // 
-            this.buttonOpenInExcel.Location = new System.Drawing.Point(3, 3);
-            this.buttonOpenInExcel.Name = "buttonOpenInExcel";
-            this.buttonOpenInExcel.Size = new System.Drawing.Size(127, 23);
-            this.buttonOpenInExcel.TabIndex = 0;
-            this.buttonOpenInExcel.Text = "Export to Excel";
-            this.buttonOpenInExcel.UseVisualStyleBackColor = true;
-            this.buttonOpenInExcel.Click += new System.EventHandler(this.buttonOpenInExcel_Click);
+            this.dataGridView1.CurrentCellChanged += new System.EventHandler(this.dataGridView1_CurrentCellChanged);
             // 
             // ID
             // 
@@ -540,6 +489,58 @@
             this.Column10.Name = "Column10";
             this.Column10.Width = 45;
             // 
+            // panel3
+            // 
+            this.panel3.Controls.Add(this.buttonOpenInExcel);
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel3.Location = new System.Drawing.Point(0, 664);
+            this.panel3.Margin = new System.Windows.Forms.Padding(0);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(300, 166);
+            this.panel3.TabIndex = 2;
+            // 
+            // buttonOpenInExcel
+            // 
+            this.buttonOpenInExcel.Location = new System.Drawing.Point(3, 3);
+            this.buttonOpenInExcel.Name = "buttonOpenInExcel";
+            this.buttonOpenInExcel.Size = new System.Drawing.Size(127, 23);
+            this.buttonOpenInExcel.TabIndex = 0;
+            this.buttonOpenInExcel.Text = "Export to Excel";
+            this.buttonOpenInExcel.UseVisualStyleBackColor = true;
+            this.buttonOpenInExcel.Click += new System.EventHandler(this.buttonOpenInExcel_Click);
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1577, 24);
+            this.menuStrip1.TabIndex = 2;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectFramesInputFolderToolStripMenuItem,
+            this.closeToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "&File";
+            // 
+            // selectFramesInputFolderToolStripMenuItem
+            // 
+            this.selectFramesInputFolderToolStripMenuItem.Name = "selectFramesInputFolderToolStripMenuItem";
+            this.selectFramesInputFolderToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.selectFramesInputFolderToolStripMenuItem.Text = "Select Frames &Input Folder";
+            this.selectFramesInputFolderToolStripMenuItem.Click += new System.EventHandler(this.selectFramesInputFolderToolStripMenuItem_Click);
+            // 
+            // closeToolStripMenuItem
+            // 
+            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.closeToolStripMenuItem.Text = "&Close";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -573,9 +574,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBarTime)).EndInit();
             this.tableLayoutPanel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.panel3.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.panel3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
