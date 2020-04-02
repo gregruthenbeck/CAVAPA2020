@@ -73,6 +73,7 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectFramesInputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.labelFrameCounter = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -332,6 +333,7 @@
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.labelFrameCounter);
             this.panel2.Controls.Add(this.labelDuration);
             this.panel2.Controls.Add(this.labelTime);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -541,6 +543,19 @@
             this.closeToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             // 
+            // labelFrameCounter
+            // 
+            this.labelFrameCounter.AutoSize = true;
+            this.labelFrameCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelFrameCounter.ForeColor = System.Drawing.SystemColors.ControlDark;
+            this.labelFrameCounter.Location = new System.Drawing.Point(154, 32);
+            this.labelFrameCounter.Name = "labelFrameCounter";
+            this.labelFrameCounter.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.labelFrameCounter.Size = new System.Drawing.Size(79, 18);
+            this.labelFrameCounter.TabIndex = 2;
+            this.labelFrameCounter.Text = "Frame: 0/0";
+            this.labelFrameCounter.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -629,6 +644,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column8;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column9;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column10;
+        private System.Windows.Forms.Label labelFrameCounter;
     }
 }
 

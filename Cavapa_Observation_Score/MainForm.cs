@@ -97,7 +97,7 @@ namespace Cavapa_Observation_Score
 
                     trackBarTime.Maximum = framesFilenames.Length - 1;
                     TimeSpan duration = new TimeSpan(10000L * (long)framesFilenames.Length * (1000L / long.Parse(textBoxFps.Text)));
-                    labelDuration.Text = duration.ToString() + "s";
+                    labelDuration.Text = duration.ToString("hh':'mm':'ss'.'ff") + "s";
 
                     trackBar1.Maximum = framesFilenames.Length - 1;
                     trackBar1.Value = 0;
@@ -152,8 +152,10 @@ namespace Cavapa_Observation_Score
 
         private void trackBar1_ValueChanged(object sender, EventArgs e)
         {
-            TimeSpan time = new TimeSpan(10000L * (long)trackBar1.Value * (long)obsInterval * (1000L / long.Parse(textBoxFps.Text)));
-            labelTime.Text = time.ToString();
+            //TimeSpan time = new TimeSpan(10000L * (long)trackBar1.Value * (long)obsInterval * (1000L / long.Parse(textBoxFps.Text)));
+            TimeSpan time = new TimeSpan(10000L * (long)trackBar1.Value * (1000L / long.Parse(textBoxFps.Text)));
+            labelTime.Text = time.ToString("hh':'mm':'ss'.'ff");
+            labelFrameCounter.Text = "Frame:  " + trackBar1.Value.ToString() + "/" + trackBar1.Maximum.ToString();
 
             //pictureBox1.Image = frames[trackBar1.Value];
             pictureBox1.Image = GetFrameFromCache(trackBar1.Value);
