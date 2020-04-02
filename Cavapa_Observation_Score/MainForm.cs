@@ -20,6 +20,8 @@ namespace Cavapa_Observation_Score
     public partial class MainForm : Form
     {
         string inputFolder;
+        string csvFilename = "cavapa_obs.csv";
+        string csvFolder = "";
         string[] inputFramesFilepaths;
         List<Bitmap> frames;
         string[] framesFilenames;
@@ -46,6 +48,7 @@ namespace Cavapa_Observation_Score
             cacheSettings.Add("pollingInterval", Convert.ToString("00:00:05"));
             memoryCache = new TrimmingMemoryCache("FrameCache", cacheSettings);
             frameCache = memoryCache;
+
             loopFrameTimer.Tick += LoopFrameTimer_Tick;
         }
         private static void CacheItemRemovedCallback(CacheEntryRemovedArguments arg)
@@ -177,7 +180,9 @@ namespace Cavapa_Observation_Score
         }
         private void dataGridView1_CurrentCellChanged(object sender, EventArgs e)
         {
-            trackBar1.Value = dataGridView1.CurrentCell.RowIndex * obsInterval;
+            if (dataGridView1.CurrentCell != null && 
+                dataGridView1.CurrentCell.RowIndex * obsInterval < trackBar1.Maximum)
+                trackBar1.Value = dataGridView1.CurrentCell.RowIndex * obsInterval;
         }
 
         private void buttonPlayLoop_Click(object sender, EventArgs e)
@@ -189,7 +194,8 @@ namespace Cavapa_Observation_Score
 
         private void buttonOpenInExcel_Click(object sender, EventArgs e)
         {
-            string csvFilepath = "cavapa_obs.csv";
+            string csvFilepath = csvFilename;
+            csvFolder = Path.GetDirectoryName(Path.GetFullPath(csvFilename));
             using (TextWriter file = File.CreateText(csvFilepath))
             {
                 string line = "";
@@ -250,6 +256,49 @@ namespace Cavapa_Observation_Score
 
             //workSheet.Columns[1].AutoFit();
             //workSheet.Columns[2].AutoFit();
+        }
+
+        private void buttonImportCSV_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.FileName = Path.Combine(csvFolder, csvFilename);
+                ofd.Filter = "CSV data file (*.csv)|*.csv|All files (*.*)|*.*";
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    using (TextReader file = File.OpenText(ofd.FileName))
+                    {
+                        csvFolder = Path.GetDirectoryName(Path.GetFullPath(ofd.FileName));
+
+                        SuspendLayout();
+
+                        dataGridView1.Rows.Clear();
+                        dataGridView1.Columns.Clear();
+
+                        char[] seps = new char[] { ',' };
+                        string line = file.ReadLine();
+                        foreach (string colHeading in line.Split(seps))
+                        {
+                            string head = colHeading.Trim();
+                            if (head.Length < 1)
+                                continue;
+
+                            if (head[0] == '"') head = head.Substring(1);
+                            if (head[head.Length - 1] == '"') head = head.Substring(0, head.Length - 1);
+                            dataGridView1.Columns.Add(head, head);
+                        }
+                        while ((line = file.ReadLine()) != null)
+                        {
+                            dataGridView1.Rows.Add(line.Split(seps));
+                        }
+                        dataGridView1.AutoResizeColumns();
+
+                        file.Close();
+
+                        ResumeLayout();
+                    }
+                }
+            }
         }
 
         private void textBoxFps_TextChanged(object sender, EventArgs e)
