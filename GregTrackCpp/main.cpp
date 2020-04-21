@@ -131,7 +131,7 @@ concurrency::task<tuple<int, double > > CreateAndSaveDeltaAsync(const int index,
 
 				path imgADbgFilepath = dbgOutFilepath.parent_path().append(outFilepath.filename().string());
 
-				if (!imgA.save(imgADbgFilepath.string().c_str()))
+				if (!((Image)imgA).save(imgADbgFilepath.string().c_str()))
 					throw(exception((stringstream("Error. Failed to save image: ") << imgADbgFilepath).str().c_str()));
 
 				if (!imgDD.save(dbgOutFilepath.string().c_str()))
