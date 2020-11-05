@@ -153,7 +153,7 @@ int main(int ac, char** av) {
 	// Declare the supported options.
 	po::options_description desc("Allowed options");
 	desc.add_options()
-		("help", "produce help message")
+		("help,h", "produce help message")
 		("inputFolder,i", po::value<string>(), "folder containing JPG files of video frames")
 		("outputFolder,o", po::value<string>(), "output folder (optional)")
 		("debugFolder,t", po::value<string>(), "debug output folder (optional)")
