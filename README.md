@@ -8,6 +8,8 @@ This is part of a [research project](https://osf.io/zwpy5/) with Heidi Pasi, Tar
 
 ## Quickstart
 
+More detailed information is in the [CAVAPA Technical Documentation](https://cavapa.ruthenbeck.io).
+
 1.	Convert video to image frames using ffmpeg.
 `ffmpeg -i ./video.mpg -q:v 1 -qmin 1 -qmax 1 ./frames/video%06d.jpg`
 2.	Run CAVAPA. It will process the images and create movement images and a CSV data file (containing the movement-measure for each frame of the video).
