@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28902.138
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GregTrackCpp", "GregTrackCpp\GregTrackCpp.vcxproj", "{CE3E41E4-473D-42E8-A479-7F5108DD3DA7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Cavapa", "Cavapa\Cavapa.vcxproj", "{CE3E41E4-473D-42E8-A479-7F5108DD3DA7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataConverterCpp", "DataConverterCpp\DataConverterCpp.vcxproj", "{C216E08F-7DCE-4708-B61B-24D7B6821B35}"
 EndProject
