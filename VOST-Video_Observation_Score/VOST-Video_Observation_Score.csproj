@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{598EA8B8-E9C5-4179-A9A1-80175EC31B4D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Cavapa_Observation_Score</RootNamespace>
-    <AssemblyName>Cavapa_Observation_Score</AssemblyName>
+    <RootNamespace>VOST</RootNamespace>
+    <AssemblyName>VOST_Video_Observation_Score</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -97,6 +97,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

@@ -15,7 +15,7 @@ using SharpMemoryCache;
 using System.Runtime.Caching;
 using System.Collections.Specialized;
 
-namespace Cavapa_Observation_Score
+namespace VOST
 {
     public partial class MainForm : Form
     {

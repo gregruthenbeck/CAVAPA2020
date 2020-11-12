@@ -1,4 +1,4 @@
-﻿namespace Cavapa_Observation_Score
+﻿namespace VOST
 {
     partial class MainForm
     {
@@ -69,12 +69,12 @@
             this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.buttonImportCSV = new System.Windows.Forms.Button();
             this.buttonOpenInExcel = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectFramesInputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.buttonImportCSV = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -102,29 +102,29 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statusProgressBar,
             this.statusLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 1643);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 1316);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 28, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(2614, 42);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 21, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(1960, 32);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // statusProgressBar
             // 
             this.statusProgressBar.Name = "statusProgressBar";
-            this.statusProgressBar.Size = new System.Drawing.Size(600, 30);
+            this.statusProgressBar.Size = new System.Drawing.Size(450, 27);
             this.statusProgressBar.Visible = false;
             // 
             // statusLabel
             // 
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(25, 32);
+            this.statusLabel.Size = new System.Drawing.Size(19, 25);
             this.statusLabel.Text = "-";
             // 
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 44);
+            this.splitContainer1.Location = new System.Drawing.Point(0, 35);
             this.splitContainer1.Margin = new System.Windows.Forms.Padding(0);
             this.splitContainer1.Name = "splitContainer1";
             // 
@@ -135,9 +135,9 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tableLayoutPanel2);
-            this.splitContainer1.Size = new System.Drawing.Size(2614, 1599);
-            this.splitContainer1.SplitterDistance = 1611;
-            this.splitContainer1.SplitterWidth = 8;
+            this.splitContainer1.Size = new System.Drawing.Size(1960, 1281);
+            this.splitContainer1.SplitterDistance = 1207;
+            this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 1;
             // 
             // splitContainer2
@@ -155,9 +155,9 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.tableLayoutPanel1);
-            this.splitContainer2.Size = new System.Drawing.Size(1611, 1599);
-            this.splitContainer2.SplitterDistance = 1072;
-            this.splitContainer2.SplitterWidth = 8;
+            this.splitContainer2.Size = new System.Drawing.Size(1207, 1281);
+            this.splitContainer2.SplitterDistance = 858;
+            this.splitContainer2.SplitterWidth = 6;
             this.splitContainer2.TabIndex = 0;
             // 
             // pictureBox1
@@ -167,7 +167,7 @@
             this.pictureBox1.Location = new System.Drawing.Point(0, 0);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1611, 1072);
+            this.pictureBox1.Size = new System.Drawing.Size(1207, 858);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
@@ -183,23 +183,23 @@
             this.tableLayoutPanel1.Controls.Add(this.trackBarTime, 0, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 38F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 77F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 62F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1611, 519);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1207, 417);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // trackBar1
             // 
             this.tableLayoutPanel1.SetColumnSpan(this.trackBar1, 2);
             this.trackBar1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.trackBar1.Location = new System.Drawing.Point(6, 38);
-            this.trackBar1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 6);
+            this.trackBar1.Location = new System.Drawing.Point(4, 30);
+            this.trackBar1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 5);
             this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(1599, 71);
+            this.trackBar1.Size = new System.Drawing.Size(1199, 57);
             this.trackBar1.TabIndex = 0;
             this.trackBar1.ValueChanged += new System.EventHandler(this.trackBar1_ValueChanged);
             // 
@@ -219,18 +219,18 @@
             this.panel1.Controls.Add(this.textBoxFps);
             this.panel1.Controls.Add(this.labelFps);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(6, 121);
-            this.panel1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.panel1.Location = new System.Drawing.Point(4, 97);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(849, 392);
+            this.panel1.Size = new System.Drawing.Size(637, 315);
             this.panel1.TabIndex = 1;
             // 
             // textBoxLoopSpeed
             // 
-            this.textBoxLoopSpeed.Location = new System.Drawing.Point(712, 104);
-            this.textBoxLoopSpeed.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.textBoxLoopSpeed.Location = new System.Drawing.Point(534, 83);
+            this.textBoxLoopSpeed.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxLoopSpeed.Name = "textBoxLoopSpeed";
-            this.textBoxLoopSpeed.Size = new System.Drawing.Size(74, 31);
+            this.textBoxLoopSpeed.Size = new System.Drawing.Size(56, 26);
             this.textBoxLoopSpeed.TabIndex = 11;
             this.textBoxLoopSpeed.Text = "2.0";
             this.textBoxLoopSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -239,19 +239,19 @@
             // labelLoopSpeed
             // 
             this.labelLoopSpeed.AutoSize = true;
-            this.labelLoopSpeed.Location = new System.Drawing.Point(612, 110);
-            this.labelLoopSpeed.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelLoopSpeed.Location = new System.Drawing.Point(459, 88);
+            this.labelLoopSpeed.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelLoopSpeed.Name = "labelLoopSpeed";
-            this.labelLoopSpeed.Size = new System.Drawing.Size(88, 25);
+            this.labelLoopSpeed.Size = new System.Drawing.Size(64, 20);
             this.labelLoopSpeed.TabIndex = 10;
             this.labelLoopSpeed.Text = "speed x";
             // 
             // buttonPlayLoop
             // 
-            this.buttonPlayLoop.Location = new System.Drawing.Point(414, 100);
-            this.buttonPlayLoop.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.buttonPlayLoop.Location = new System.Drawing.Point(310, 80);
+            this.buttonPlayLoop.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonPlayLoop.Name = "buttonPlayLoop";
-            this.buttonPlayLoop.Size = new System.Drawing.Size(190, 44);
+            this.buttonPlayLoop.Size = new System.Drawing.Size(142, 35);
             this.buttonPlayLoop.TabIndex = 9;
             this.buttonPlayLoop.Text = "Play Loops";
             this.buttonPlayLoop.UseVisualStyleBackColor = true;
@@ -260,19 +260,19 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(308, 110);
-            this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label1.Location = new System.Drawing.Point(231, 88);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(93, 25);
+            this.label1.Size = new System.Drawing.Size(69, 20);
             this.label1.TabIndex = 8;
             this.label1.Text = "seconds";
             // 
             // textBoxLoopInterval
             // 
-            this.textBoxLoopInterval.Location = new System.Drawing.Point(232, 104);
-            this.textBoxLoopInterval.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.textBoxLoopInterval.Location = new System.Drawing.Point(174, 83);
+            this.textBoxLoopInterval.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxLoopInterval.Name = "textBoxLoopInterval";
-            this.textBoxLoopInterval.Size = new System.Drawing.Size(60, 31);
+            this.textBoxLoopInterval.Size = new System.Drawing.Size(46, 26);
             this.textBoxLoopInterval.TabIndex = 7;
             this.textBoxLoopInterval.Text = "5";
             this.textBoxLoopInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -281,10 +281,10 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(18, 110);
-            this.label2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label2.Location = new System.Drawing.Point(14, 88);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(147, 25);
+            this.label2.Size = new System.Drawing.Size(110, 20);
             this.label2.TabIndex = 6;
             this.label2.Text = "Loop Duration";
             this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -292,29 +292,29 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(308, 62);
-            this.label5.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label5.Location = new System.Drawing.Point(231, 50);
+            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(93, 25);
+            this.label5.Size = new System.Drawing.Size(69, 20);
             this.label5.TabIndex = 5;
             this.label5.Text = "seconds";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(308, 12);
-            this.label4.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label4.Location = new System.Drawing.Point(231, 10);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(38, 25);
+            this.label4.Size = new System.Drawing.Size(29, 20);
             this.label4.TabIndex = 4;
             this.label4.Text = "Hz";
             // 
             // textBoxObsInterval
             // 
-            this.textBoxObsInterval.Location = new System.Drawing.Point(232, 56);
-            this.textBoxObsInterval.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.textBoxObsInterval.Location = new System.Drawing.Point(174, 45);
+            this.textBoxObsInterval.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxObsInterval.Name = "textBoxObsInterval";
-            this.textBoxObsInterval.Size = new System.Drawing.Size(60, 31);
+            this.textBoxObsInterval.Size = new System.Drawing.Size(46, 26);
             this.textBoxObsInterval.TabIndex = 3;
             this.textBoxObsInterval.Text = "5";
             this.textBoxObsInterval.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -323,20 +323,20 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(18, 62);
-            this.label3.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label3.Location = new System.Drawing.Point(14, 50);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(204, 25);
+            this.label3.Size = new System.Drawing.Size(150, 20);
             this.label3.TabIndex = 2;
             this.label3.Text = "Observation Interval";
             this.label3.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // textBoxFps
             // 
-            this.textBoxFps.Location = new System.Drawing.Point(232, 6);
-            this.textBoxFps.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.textBoxFps.Location = new System.Drawing.Point(174, 5);
+            this.textBoxFps.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxFps.Name = "textBoxFps";
-            this.textBoxFps.Size = new System.Drawing.Size(60, 31);
+            this.textBoxFps.Size = new System.Drawing.Size(46, 26);
             this.textBoxFps.TabIndex = 1;
             this.textBoxFps.Text = "25";
             this.textBoxFps.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -345,10 +345,10 @@
             // labelFps
             // 
             this.labelFps.AutoSize = true;
-            this.labelFps.Location = new System.Drawing.Point(36, 12);
-            this.labelFps.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelFps.Location = new System.Drawing.Point(27, 10);
+            this.labelFps.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelFps.Name = "labelFps";
-            this.labelFps.Size = new System.Drawing.Size(185, 25);
+            this.labelFps.Size = new System.Drawing.Size(139, 20);
             this.labelFps.TabIndex = 0;
             this.labelFps.Text = "Frame Rate (FPS)";
             this.labelFps.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -360,10 +360,10 @@
             this.panel2.Controls.Add(this.labelDuration);
             this.panel2.Controls.Add(this.labelTime);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(867, 121);
-            this.panel2.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.panel2.Location = new System.Drawing.Point(649, 97);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(738, 392);
+            this.panel2.Size = new System.Drawing.Size(554, 315);
             this.panel2.TabIndex = 2;
             // 
             // labelFrameCounter
@@ -371,11 +371,11 @@
             this.labelFrameCounter.AutoSize = true;
             this.labelFrameCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelFrameCounter.ForeColor = System.Drawing.SystemColors.ControlDark;
-            this.labelFrameCounter.Location = new System.Drawing.Point(8, 61);
-            this.labelFrameCounter.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelFrameCounter.Location = new System.Drawing.Point(6, 49);
+            this.labelFrameCounter.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelFrameCounter.Name = "labelFrameCounter";
             this.labelFrameCounter.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.labelFrameCounter.Size = new System.Drawing.Size(156, 36);
+            this.labelFrameCounter.Size = new System.Drawing.Size(128, 29);
             this.labelFrameCounter.TabIndex = 2;
             this.labelFrameCounter.Text = "Frame: 0/0";
             this.labelFrameCounter.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -383,10 +383,10 @@
             // labelDuration
             // 
             this.labelDuration.AutoSize = true;
-            this.labelDuration.Location = new System.Drawing.Point(218, 27);
-            this.labelDuration.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelDuration.Location = new System.Drawing.Point(164, 22);
+            this.labelDuration.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelDuration.Name = "labelDuration";
-            this.labelDuration.Size = new System.Drawing.Size(137, 25);
+            this.labelDuration.Size = new System.Drawing.Size(100, 20);
             this.labelDuration.TabIndex = 1;
             this.labelDuration.Text = "/ 0:00:00.00s";
             // 
@@ -394,11 +394,11 @@
             // 
             this.labelTime.AutoSize = true;
             this.labelTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTime.Location = new System.Drawing.Point(6, 11);
-            this.labelTime.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.labelTime.Location = new System.Drawing.Point(4, 9);
+            this.labelTime.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelTime.Name = "labelTime";
             this.labelTime.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.labelTime.Size = new System.Drawing.Size(219, 44);
+            this.labelTime.Size = new System.Drawing.Size(166, 33);
             this.labelTime.TabIndex = 0;
             this.labelTime.Text = "0:00:00.00s";
             this.labelTime.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -408,10 +408,10 @@
             this.tableLayoutPanel1.SetColumnSpan(this.trackBarTime, 2);
             this.trackBarTime.Dock = System.Windows.Forms.DockStyle.Fill;
             this.trackBarTime.Enabled = false;
-            this.trackBarTime.Location = new System.Drawing.Point(10, 6);
-            this.trackBarTime.Margin = new System.Windows.Forms.Padding(10, 6, 10, 0);
+            this.trackBarTime.Location = new System.Drawing.Point(8, 5);
+            this.trackBarTime.Margin = new System.Windows.Forms.Padding(8, 5, 8, 0);
             this.trackBarTime.Name = "trackBarTime";
-            this.trackBarTime.Size = new System.Drawing.Size(1591, 32);
+            this.trackBarTime.Size = new System.Drawing.Size(1191, 25);
             this.trackBarTime.TabIndex = 3;
             this.trackBarTime.TickStyle = System.Windows.Forms.TickStyle.None;
             // 
@@ -429,7 +429,7 @@
             this.tableLayoutPanel2.RowCount = 2;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 80F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(995, 1599);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(747, 1281);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // dataGridView1
@@ -454,7 +454,7 @@
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(0);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 82;
-            this.dataGridView1.Size = new System.Drawing.Size(995, 1279);
+            this.dataGridView1.Size = new System.Drawing.Size(747, 1024);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CurrentCellChanged += new System.EventHandler(this.dataGridView1_CurrentCellChanged);
             // 
@@ -549,18 +549,29 @@
             this.panel3.Controls.Add(this.buttonImportCSV);
             this.panel3.Controls.Add(this.buttonOpenInExcel);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(0, 1279);
+            this.panel3.Location = new System.Drawing.Point(0, 1024);
             this.panel3.Margin = new System.Windows.Forms.Padding(0);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(497, 320);
+            this.panel3.Size = new System.Drawing.Size(373, 257);
             this.panel3.TabIndex = 2;
+            // 
+            // buttonImportCSV
+            // 
+            this.buttonImportCSV.Location = new System.Drawing.Point(4, 57);
+            this.buttonImportCSV.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonImportCSV.Name = "buttonImportCSV";
+            this.buttonImportCSV.Size = new System.Drawing.Size(190, 35);
+            this.buttonImportCSV.TabIndex = 1;
+            this.buttonImportCSV.Text = "Import CSV";
+            this.buttonImportCSV.UseVisualStyleBackColor = true;
+            this.buttonImportCSV.Click += new System.EventHandler(this.buttonImportCSV_Click);
             // 
             // buttonOpenInExcel
             // 
-            this.buttonOpenInExcel.Location = new System.Drawing.Point(6, 6);
-            this.buttonOpenInExcel.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.buttonOpenInExcel.Location = new System.Drawing.Point(4, 5);
+            this.buttonOpenInExcel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonOpenInExcel.Name = "buttonOpenInExcel";
-            this.buttonOpenInExcel.Size = new System.Drawing.Size(254, 44);
+            this.buttonOpenInExcel.Size = new System.Drawing.Size(190, 35);
             this.buttonOpenInExcel.TabIndex = 0;
             this.buttonOpenInExcel.Text = "Export to Excel";
             this.buttonOpenInExcel.UseVisualStyleBackColor = true;
@@ -568,13 +579,13 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(12, 4, 0, 4);
-            this.menuStrip1.Size = new System.Drawing.Size(2614, 44);
+            this.menuStrip1.Size = new System.Drawing.Size(1960, 35);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -584,43 +595,32 @@
             this.selectFramesInputFolderToolStripMenuItem,
             this.closeToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(72, 36);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(54, 29);
             this.fileToolStripMenuItem.Text = "&File";
             // 
             // selectFramesInputFolderToolStripMenuItem
             // 
             this.selectFramesInputFolderToolStripMenuItem.Name = "selectFramesInputFolderToolStripMenuItem";
-            this.selectFramesInputFolderToolStripMenuItem.Size = new System.Drawing.Size(433, 44);
+            this.selectFramesInputFolderToolStripMenuItem.Size = new System.Drawing.Size(324, 34);
             this.selectFramesInputFolderToolStripMenuItem.Text = "Select Frames &Input Folder";
             this.selectFramesInputFolderToolStripMenuItem.Click += new System.EventHandler(this.selectFramesInputFolderToolStripMenuItem_Click);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(433, 44);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(324, 34);
             this.closeToolStripMenuItem.Text = "&Close";
-            // 
-            // buttonImportCSV
-            // 
-            this.buttonImportCSV.Location = new System.Drawing.Point(6, 71);
-            this.buttonImportCSV.Margin = new System.Windows.Forms.Padding(6);
-            this.buttonImportCSV.Name = "buttonImportCSV";
-            this.buttonImportCSV.Size = new System.Drawing.Size(254, 44);
-            this.buttonImportCSV.TabIndex = 1;
-            this.buttonImportCSV.Text = "Import CSV";
-            this.buttonImportCSV.UseVisualStyleBackColor = true;
-            this.buttonImportCSV.Click += new System.EventHandler(this.buttonImportCSV_Click);
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2614, 1685);
+            this.ClientSize = new System.Drawing.Size(1960, 1348);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "MainForm";
             this.Text = "VOST - Video Observational Scoring Tool - Greg Ruthenbeck © 2020";
             this.Load += new System.EventHandler(this.MainForm_Load);

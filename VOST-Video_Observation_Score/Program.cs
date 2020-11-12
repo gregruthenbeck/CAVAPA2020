@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Cavapa_Observation_Score
+namespace VOST
 {
     static class Program
     {
