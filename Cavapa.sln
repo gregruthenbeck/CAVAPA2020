@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cavapa_dotNet_Prototype", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cavapa_dotNet_Batch_Processor", "Cavapa_dotNet_Batch_Processor\Cavapa_dotNet_Batch_Processor.csproj", "{9BE3303A-5857-434B-874D-EAA350244EF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cavapa_Observation_Score", "Cavapa_Observation_Score\Cavapa_Observation_Score.csproj", "{598EA8B8-E9C5-4179-A9A1-80175EC31B4D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VOST-Video_Observation_Score", "VOST-Video_Observation_Score\VOST-Video_Observation_Score.csproj", "{598EA8B8-E9C5-4179-A9A1-80175EC31B4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
