@@ -2,7 +2,7 @@
 
 A C++ application that processes video to measure movement of persons within the field-of-view.
 
-[![CAVAPA motion measurement from video](GregTrackCpp/cavapa.png)](https://imgur.com/AoeUMwc)
+[![CAVAPA motion measurement from video](Cavapa/cavapa.png)](https://imgur.com/AoeUMwc)
 
 This is part of a [research project](https://osf.io/zwpy5/) with Heidi Pasi, Taru Lintunen, Martin Hagger. Jyväskylä University (Finland).
 
