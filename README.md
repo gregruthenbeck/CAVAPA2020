@@ -28,5 +28,5 @@ Cavapa is a command-line executable that is written in C++ for Microsoft Windows
 *	Reading/writing image files (PNG, BMP, TIF, etc):
 [Free Image & Free Image Plus](http://freeimage.sourceforge.net/).
  
-The source code is a single file that is compiled using Microsoft Visual Studio 2019. System libraries from the Windows 10 SDK (10.0.17763.0) use the v142 platform toolset. Source code is available online at https://github.com/gregruthenbeck/CAVAPA2019 (NB: The git repo contains additional projects for charting in C# (incomplete) and processing accelerometer data (DataConverterCpp.vcxproj). The Cavapa executable is built using GregTrackCpp.vcxproj.
+The source code is a single file that is compiled using Microsoft Visual Studio 2019. System libraries from the Windows 10 SDK (10.0.17763.0) use the v142 platform toolset. Source code is available online at https://github.com/gregruthenbeck/CAVAPA2020 (NB: The git repo contains additional projects for charting in C# (incomplete) and processing accelerometer data (DataConverterCpp.vcxproj). The Cavapa executable is built using Cavapa.vcxproj.
 
